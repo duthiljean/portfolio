@@ -95,23 +95,76 @@
     background: linear-gradient(135deg, hsl(210 100% 97%), hsl(0 0% 100%), hsl(217 91% 60% / 0.05), hsl(210 100% 97%));
     background-size: 400% 400%;
     animation: meshGradient 18s ease infinite;
+    will-change: background-position;
   }
 }
 
 @keyframes meshGradient {
-  0% {
-    background-position: 0% 50%;
+  0% { background-position: 0% 50%; }
+  25% { background-position: 100% 25%; }
+  50% { background-position: 100% 50%; }
+  75% { background-position: 0% 75%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* GPU-composited blob animations — no JS ticks */
+@keyframes blob1 {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  33% { transform: translate3d(24px, -18px, 0); }
+  66% { transform: translate3d(-12px, 12px, 0); }
+}
+
+@keyframes blob2 {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  33% { transform: translate3d(-20px, 16px, 0); }
+  66% { transform: translate3d(10px, -10px, 0); }
+}
+
+.animate-blob-1 {
+  animation: blob1 22s ease-in-out infinite;
+}
+
+.animate-blob-2 {
+  animation: blob2 18s ease-in-out 3s infinite;
+}
+
+/* Contact section blobs — CSS only */
+@keyframes contactBlob1 {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.12); }
+}
+
+@keyframes contactBlob2 {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.07); }
+}
+
+.animate-contact-blob-1 {
+  animation: contactBlob1 9s ease-in-out infinite;
+}
+
+.animate-contact-blob-2 {
+  animation: contactBlob2 11s ease-in-out 3s infinite;
+}
+
+/* Respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .animate-blob-1,
+  .animate-blob-2,
+  .animate-contact-blob-1,
+  .animate-contact-blob-2 {
+    animation: none !important;
   }
-  25% {
-    background-position: 100% 25%;
+
+  .hero-gradient {
+    animation: none !important;
   }
-  50% {
-    background-position: 100% 50%;
+
+  .animate-pulse_dot {
+    animation: none !important;
   }
-  75% {
-    background-position: 0% 75%;
-  }
-  100% {
-    background-position: 0% 50%;
+
+  html {
+    scroll-behavior: auto;
   }
 }

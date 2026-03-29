@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import { Bot, Rocket, Lightbulb } from "lucide-react";
 import { motion, useInView } from "framer-motion";
 import ScrollReveal from "./ScrollReveal";
@@ -12,8 +13,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useLanguage } from "@/i18n/LanguageContext";
-import { useTilt } from "@/hooks/use-tilt";
-
 const pillLogos: Record<string, string> = {
   Claude: claudeLogo,
   ChatGPT: chatgptLogo,
@@ -32,31 +31,21 @@ type Category = {
 };
 
 const CategoryCard = ({ cat, index }: { cat: Category; index: number }) => {
-  const { ref, tilt, onMouseMove, onMouseLeave } = useTilt(3);
-  const isInView = useInView(ref, { once: true, amount: 0.2 });
+  const ref = useRef<HTMLDivElement>(null);
+  const isInView = useInView(ref as React.RefObject<Element>, { once: true, amount: 0.2 });
 
   return (
-    <motion.div
-      ref={ref}
-      onMouseMove={onMouseMove}
-      onMouseLeave={onMouseLeave}
-      animate={{
-        opacity: isInView ? 1 : 0,
-        y: isInView ? 0 : 40,
-        scale: isInView ? 1 : 0.96,
-        rotateX: tilt.x,
-        rotateY: tilt.y,
-      }}
-      transition={{
-        opacity: { duration: 0.5, delay: index * 0.12, ease: [0.16, 1, 0.3, 1] },
-        y: { duration: 0.6, delay: index * 0.12, ease: [0.16, 1, 0.3, 1] },
-        scale: { duration: 0.6, delay: index * 0.12, ease: [0.16, 1, 0.3, 1] },
-        rotateX: { type: "spring", stiffness: 300, damping: 30 },
-        rotateY: { type: "spring", stiffness: 300, damping: 30 },
-      }}
-      style={{ perspective: "800px", transformStyle: "preserve-3d" }}
-      className="bg-card rounded-2xl p-6 border border-border/50 relative overflow-hidden group hover:shadow-lg hover:border-accent/20 transition-[box-shadow,border-color] duration-300"
-    >
+    <div ref={ref}>
+      <motion.div
+        initial={{ opacity: 0, y: 40, scale: 0.96 }}
+        animate={isInView ? { opacity: 1, y: 0, scale: 1 } : {}}
+        transition={{
+          duration: 0.6,
+          delay: index * 0.12,
+          ease: [0.16, 1, 0.3, 1],
+        }}
+        className="bg-card rounded-2xl p-6 border border-border/50 relative overflow-hidden group hover:shadow-lg hover:border-accent/20 transition-[box-shadow,border-color] duration-300"
+      >
       {/* Ligne d'accent animée en haut */}
       <motion.div
         className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-accent/50 to-transparent origin-center"
@@ -142,6 +131,7 @@ const CategoryCard = ({ cat, index }: { cat: Category; index: number }) => {
         })}
       </div>
     </motion.div>
+    </div>
   );
 };
 

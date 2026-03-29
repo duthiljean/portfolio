@@ -1,14 +1,18 @@
 import { useState, useEffect } from "react";
 import { Menu, X, Globe } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useTransform, useReducedMotion } from "framer-motion";
 import { useLanguage } from "@/i18n/LanguageContext";
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [scrollProgress, setScrollProgress] = useState(0);
   const [activeSection, setActiveSection] = useState("");
   const { lang, setLang, t } = useLanguage();
+  const prefersReduced = useReducedMotion();
+
+  // Scroll progress via motion values — no re-renders
+  const { scrollYProgress } = useScroll();
+  const progressWidth = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
 
   const navLinks = [
     { label: t("nav.about"), href: "#about" },
@@ -25,8 +29,6 @@ const Navbar = () => {
       ticking = true;
       requestAnimationFrame(() => {
         setScrolled(window.scrollY > 50);
-        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-        setScrollProgress(docHeight > 0 ? (window.scrollY / docHeight) * 100 : 0);
 
         const sections = ["about", "experience", "education", "skills", "contact"];
         let current = "";
@@ -54,11 +56,12 @@ const Navbar = () => {
           : "bg-transparent"
       }`}
     >
-      <motion.div
-        className="absolute bottom-0 left-0 h-[2px] bg-accent origin-left"
-        style={{ width: `${scrollProgress}%` }}
-        transition={{ duration: 0.1 }}
-      />
+      {!prefersReduced && (
+        <motion.div
+          className="absolute bottom-0 left-0 h-[2px] bg-accent origin-left"
+          style={{ width: progressWidth }}
+        />
+      )}
 
       <div className="container mx-auto flex items-center justify-between h-16 px-4">
         <a href="#hero" className="text-lg font-bold text-primary tracking-tight hover:text-accent transition-colors">
@@ -99,10 +102,11 @@ const Navbar = () => {
         <div className="flex md:hidden items-center gap-2">
           <button
             onClick={() => setLang(lang === "fr" ? "en" : "fr")}
-            className="p-2 text-muted-foreground hover:text-primary transition-colors"
+            className="inline-flex items-center gap-1 px-2 py-1.5 text-xs font-medium text-muted-foreground hover:text-primary transition-colors rounded-lg"
             aria-label="Toggle language"
           >
-            <Globe size={18} />
+            <Globe size={16} />
+            {lang === "fr" ? "EN" : "FR"}
           </button>
           <button
             className="p-2 text-foreground"

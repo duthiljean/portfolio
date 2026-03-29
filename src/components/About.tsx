@@ -100,7 +100,11 @@ const About = () => {
                   stiffness: 350,
                   damping: 22,
                 }}
-                className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-card border border-border/50 text-xs sm:text-sm text-muted-foreground shadow-sm hover:border-accent/30 hover:text-foreground transition-all duration-200"
+                className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-card border text-xs sm:text-sm shadow-sm transition-all duration-200 ${
+                  info.href
+                    ? "border-accent/30 text-foreground hover:border-accent hover:bg-accent/5 cursor-pointer"
+                    : "border-border/50 text-muted-foreground"
+                }`}
               >
                 <info.icon size={13} className="text-accent shrink-0" />
                 {info.label}

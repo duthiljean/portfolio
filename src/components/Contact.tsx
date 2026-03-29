@@ -26,8 +26,11 @@ const Contact = () => {
   return (
     <section
       id="contact"
-      className="py-24 md:py-32 px-4 md:px-8 bg-primary relative overflow-hidden"
+      className="relative overflow-hidden"
     >
+      {/* Gradient transition from white to dark */}
+      <div className="h-20 md:h-28 bg-gradient-to-b from-background to-primary" />
+      <div className="py-16 md:py-24 px-4 md:px-8 bg-primary relative">
       {/* Background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div
@@ -38,16 +41,10 @@ const Contact = () => {
             backgroundSize: "60px 60px",
           }}
         />
-        <motion.div
-          className="absolute -top-40 -left-40 w-[500px] h-[500px] bg-white/5 rounded-full"
-          animate={{ scale: [1, 1.12, 1] }}
-          transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div
-          className="absolute -bottom-40 -right-40 w-[600px] h-[600px] rounded-full"
+        <div className="absolute -top-40 -left-40 w-[500px] h-[500px] bg-white/5 rounded-full will-change-transform animate-contact-blob-1" />
+        <div
+          className="absolute -bottom-40 -right-40 w-[600px] h-[600px] rounded-full will-change-transform animate-contact-blob-2"
           style={{ background: "hsl(var(--accent) / 0.12)" }}
-          animate={{ scale: [1, 1.07, 1] }}
-          transition={{ duration: 11, repeat: Infinity, ease: "easeInOut", delay: 3 }}
         />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[400px] rounded-full blur-3xl" style={{ background: "hsl(var(--accent) / 0.06)" }} />
       </div>
@@ -183,17 +180,18 @@ const Contact = () => {
           </a>
         </motion.div>
       </div>
+      </div>
     </section>
   );
 };
 
 const Footer = () => {
-  const { t } = useLanguage();
+  const { lang } = useLanguage();
   return (
     <footer className="bg-primary border-t border-white/10 py-6 px-4">
       <div className="container mx-auto max-w-4xl flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-primary-foreground/50">
         <span>&copy; {new Date().getFullYear()} Jean Duthil</span>
-        <span>{t("footer.made")}</span>
+        <span>{lang === "fr" ? "Construit avec l'IA" : "Built with AI"}</span>
       </div>
     </footer>
   );

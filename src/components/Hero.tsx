@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { ArrowDown, ArrowRight, Mail, Linkedin } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useTilt } from "@/hooks/use-tilt";
@@ -78,17 +78,9 @@ const Hero = () => {
       {/* Fond gradient animé */}
       <div className="absolute inset-0 hero-gradient" />
 
-      {/* Blobs flottants */}
-      <motion.div
-        className="absolute top-20 -left-32 w-64 md:w-96 h-64 md:h-96 bg-accent/8 rounded-full blur-3xl pointer-events-none"
-        animate={{ x: [0, 24, -12, 0], y: [0, -18, 12, 0] }}
-        transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <motion.div
-        className="absolute bottom-20 -right-32 w-64 md:w-96 h-64 md:h-96 bg-primary/5 rounded-full blur-3xl pointer-events-none"
-        animate={{ x: [0, -20, 10, 0], y: [0, 16, -10, 0] }}
-        transition={{ duration: 18, repeat: Infinity, ease: "easeInOut", delay: 3 }}
-      />
+      {/* Blobs flottants — CSS only for GPU compositing */}
+      <div className="absolute top-20 -left-32 w-64 md:w-96 h-64 md:h-96 bg-accent/8 rounded-full blur-3xl pointer-events-none will-change-transform animate-blob-1" />
+      <div className="absolute bottom-20 -right-32 w-64 md:w-96 h-64 md:h-96 bg-primary/5 rounded-full blur-3xl pointer-events-none will-change-transform animate-blob-2" />
 
       <div className="container mx-auto text-center max-w-3xl relative z-10">
 
