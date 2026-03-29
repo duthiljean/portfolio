@@ -36,7 +36,7 @@ const translations: Record<Lang, Record<string, string>> = {
     // About
     "about.title": "À propos",
     "about.description":
-      "Étudiant en Bachelor à l'ESSCA, je recherche une alternance à partir de septembre 2026 en Business Development, Product Management ou IA appliquée. Je conçois des produits et développe des opportunités de croissance en utilisant l'IA comme levier à chaque étape, de la prospection à la mise en production. Actuellement en stage chez Roofwander, une marketplace de tentes de toit, j'ai également conçu et lancé AdDetective, un SaaS d'analyse d'annonces basé sur l'IA.",
+      "Je conçois des produits et développe des activités en utilisant l'IA comme levier — de la prospection à la mise en production. Actuellement en stage chez Roofwander, j'ai aussi lancé AdDetective, un SaaS d'analyse d'annonces propulsé par l'IA.",
     "about.location": "Bordeaux, France",
     "about.phone": "07 60 04 90 11",
     "about.rhythm": "Rythme : 2 sem. entreprise / 1 sem. école",
@@ -167,7 +167,7 @@ const translations: Record<Lang, Record<string, string>> = {
     // About
     "about.title": "About",
     "about.description":
-      "Bachelor student at ESSCA, I'm looking for an internship starting September 2026 in Business Development, Product Management or Applied AI. I design products and develop growth opportunities using AI as a lever at every stage, from prospecting to production. Currently interning at Roofwander, a rooftop tent marketplace, I also designed and launched AdDetective, an AI-powered listing analysis SaaS.",
+      "I build products and grow businesses using AI as a lever — from prospecting to production. Currently interning at Roofwander, I also launched AdDetective, an AI-powered listing analysis SaaS.",
     "about.location": "Bordeaux, France",
     "about.phone": "07 60 04 90 11",
     "about.rhythm": "Schedule: 2 weeks company / 1 week school",

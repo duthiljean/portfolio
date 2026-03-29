@@ -73,7 +73,7 @@ const Hero = () => {
   return (
     <section
       id="hero"
-      className="min-h-[100svh] flex items-center justify-center px-4 pt-16 pb-8 relative overflow-hidden"
+      className="min-h-[100svh] flex items-center justify-center px-4 pt-14 pb-6 relative overflow-hidden"
     >
       {/* Fond gradient animé */}
       <div className="absolute inset-0 hero-gradient" />
@@ -89,7 +89,7 @@ const Hero = () => {
           initial={{ opacity: 0, scale: 0.85 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-          className="mb-6"
+          className="mb-4"
         >
           <div
             ref={ref}
@@ -107,7 +107,7 @@ const Hero = () => {
                   src="/jean-duthil-photo.jpg"
                   alt="Jean Duthil"
                   loading="eager"
-                  className="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover object-top block"
+                  className="w-20 h-20 sm:w-24 sm:h-24 md:w-32 md:h-32 rounded-full object-cover object-top block"
                   animate={{
                     rotateX: tilt.x,
                     rotateY: tilt.y,
@@ -130,7 +130,7 @@ const Hero = () => {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.28, ease: [0.16, 1, 0.3, 1] }}
-          className="mt-4 md:mt-6"
+          className="mt-3 md:mt-4"
         >
           <RoleCarousel />
         </motion.div>
@@ -140,7 +140,7 @@ const Hero = () => {
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.4, delay: 0.38, ease: [0.16, 1, 0.3, 1] }}
-          className="mt-6 md:mt-8 inline-flex items-center gap-2 rounded-full bg-green-50 border border-green-200 px-4 md:px-5 py-2 md:py-2.5 text-xs md:text-sm font-medium text-green-700"
+          className="mt-5 md:mt-6 inline-flex items-center gap-2 rounded-full bg-green-50 border border-green-200 px-4 md:px-5 py-2 md:py-2.5 text-xs md:text-sm font-medium text-green-700"
         >
           <span className="relative flex h-2 w-2 md:h-2.5 md:w-2.5 shrink-0">
             <span className="animate-pulse_dot absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
@@ -154,7 +154,7 @@ const Hero = () => {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.48, ease: [0.16, 1, 0.3, 1] }}
-          className="mt-8 md:mt-10 flex flex-col sm:flex-row gap-3 justify-center px-4 sm:px-0"
+          className="mt-6 md:mt-8 flex flex-col sm:flex-row gap-3 justify-center px-4 sm:px-0"
         >
           <a
             href="#about"
@@ -177,23 +177,23 @@ const Hero = () => {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.58, ease: [0.16, 1, 0.3, 1] }}
-          className="mt-5 flex items-center justify-center gap-2"
+          className="mt-4 flex items-center justify-center gap-2"
         >
           <a
             href="https://linkedin.com/in/duthiljean"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs text-muted-foreground border border-border/50 bg-card/60 hover:text-accent hover:border-accent/30 hover:bg-card transition-all duration-200 shadow-sm"
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-medium text-muted-foreground border border-border/50 bg-card/60 hover:text-accent hover:border-accent/30 hover:bg-card transition-all duration-200 shadow-sm"
           >
-            <Linkedin size={13} />
+            <Linkedin size={14} />
             LinkedIn
           </a>
           <span className="w-px h-4 bg-border/60" />
           <a
             href="mailto:jean.duthil13@gmail.com"
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs text-muted-foreground border border-border/50 bg-card/60 hover:text-accent hover:border-accent/30 hover:bg-card transition-all duration-200 shadow-sm"
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-medium text-muted-foreground border border-border/50 bg-card/60 hover:text-accent hover:border-accent/30 hover:bg-card transition-all duration-200 shadow-sm"
           >
-            <Mail size={13} />
+            <Mail size={14} />
             jean.duthil13@gmail.com
           </a>
         </motion.div>
@@ -203,7 +203,7 @@ const Hero = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.7, duration: 0.5 }}
-          className="mt-12 md:mt-16"
+          className="mt-8 md:mt-10"
         >
           <motion.a
             href="#about"

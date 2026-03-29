@@ -184,15 +184,15 @@ const Skills = () => {
 
   return (
     <TooltipProvider delayDuration={200}>
-      <section id="skills" className="py-20 md:py-32 px-4 md:px-8">
+      <section id="skills" className="py-12 md:py-20 px-4 md:px-8">
         <div className="container mx-auto max-w-5xl">
           <ScrollReveal>
-            <h2 className="text-3xl md:text-5xl font-bold text-primary mb-3 text-center tracking-tight">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary mb-3 text-center tracking-tight">
               {t("skills.title")}
             </h2>
           </ScrollReveal>
           <ScrollReveal delay={0.05}>
-            <p className="text-muted-foreground text-base md:text-lg text-center mb-14 md:mb-16 max-w-xl mx-auto leading-relaxed">
+            <p className="text-muted-foreground text-sm md:text-base text-center mb-8 md:mb-10 max-w-xl mx-auto leading-relaxed">
               {t("skills.subtitle")}
             </p>
           </ScrollReveal>

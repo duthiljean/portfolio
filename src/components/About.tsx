@@ -70,10 +70,10 @@ const About = () => {
   ];
 
   return (
-    <section id="about" className="py-16 md:py-28 px-4 md:px-8 section-alt-bg">
+    <section id="about" className="py-12 md:py-20 px-4 md:px-8 section-alt-bg">
       <div className="container mx-auto max-w-4xl">
         <ScrollReveal>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary mb-4 text-center">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary mb-3 text-center">
             {t("about.title")}
           </h2>
         </ScrollReveal>
@@ -131,7 +131,7 @@ const About = () => {
           initial={{ opacity: 0, y: 28 }}
           animate={isStatsInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-          className="mt-10 md:mt-14 bg-card rounded-2xl border border-border/50 shadow-sm overflow-hidden"
+          className="mt-8 md:mt-10 bg-card rounded-2xl border border-border/50 shadow-sm overflow-hidden"
         >
           <div className="grid grid-cols-3 divide-x divide-border/50">
             {stats.map((s, i) => (
@@ -166,7 +166,7 @@ const About = () => {
 
                 <Counter target={s.value} suffix={s.suffix} isInView={isStatsInView} />
 
-                <p className="mt-1.5 text-[11px] sm:text-xs font-medium text-muted-foreground leading-tight">
+                <p className="mt-1.5 text-xs font-medium text-muted-foreground leading-tight">
                   {s.label}
                 </p>
               </motion.div>

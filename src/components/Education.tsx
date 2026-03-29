@@ -32,14 +32,14 @@ const AnthropicCard = ({ delay, isOpen, onToggle }: { delay: number; isOpen: boo
       <motion.button
         onClick={onToggle}
         whileTap={{ scale: 0.98 }}
-        className="w-full text-left bg-card rounded-xl p-4 sm:p-5 shadow-sm border border-border/50 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 cursor-pointer"
+        className="w-full text-left bg-card rounded-xl p-5 sm:p-6 shadow-sm border border-border/50 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 cursor-pointer"
       >
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-start gap-2.5 sm:gap-3">
             <img src={anthropicLogo} alt="Anthropic" className="w-8 h-8 rounded-lg shrink-0 mt-0.5" />
             <div>
               <h4 className="text-xs sm:text-sm font-semibold text-foreground leading-tight">Anthropic</h4>
-              <p className="text-[11px] sm:text-xs text-muted-foreground mt-0.5">
+              <p className="text-xs text-muted-foreground mt-0.5">
                 {t("edu.anthropic.count")}
               </p>
             </div>
@@ -100,7 +100,7 @@ const CertCard = ({ cert, delay, isOpen, onToggle }: { cert: Certification; dela
       <motion.button
         onClick={() => cert.image && onToggle()}
         whileTap={cert.image ? { scale: 0.98 } : undefined}
-        className={`w-full text-left bg-card rounded-xl p-4 sm:p-5 shadow-sm border border-border/50 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 ${cert.image ? "cursor-pointer" : ""}`}
+        className={`w-full text-left bg-card rounded-xl p-5 sm:p-6 shadow-sm border border-border/50 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 ${cert.image ? "cursor-pointer" : ""}`}
       >
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-start gap-2.5 sm:gap-3">
@@ -115,7 +115,7 @@ const CertCard = ({ cert, delay, isOpen, onToggle }: { cert: Certification; dela
             )}
             <div>
               <h4 className="text-xs sm:text-sm font-semibold text-foreground leading-tight">{cert.title}</h4>
-              <p className="text-[11px] sm:text-xs text-muted-foreground mt-0.5">
+              <p className="text-xs text-muted-foreground mt-0.5">
                 {cert.title === "MOOC Creative Box" ? t("edu.mooc.org") : t("edu.ai.org")}
               </p>
             </div>
@@ -162,14 +162,14 @@ const Education = () => {
   ];
 
   return (
-    <section id="education" className="py-16 md:py-28 px-4 md:px-8">
+    <section id="education" className="py-12 md:py-20 px-4 md:px-8">
       <div className="container mx-auto max-w-4xl">
         <ScrollReveal>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary mb-8 sm:mb-12 text-center">{t("edu.title")}</h2>
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary mb-6 sm:mb-8 text-center">{t("edu.title")}</h2>
         </ScrollReveal>
 
         <ScrollReveal delay={0.1}>
-          <div className="bg-card rounded-xl p-5 sm:p-6 md:p-8 shadow-sm border border-border/50 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 max-w-xl mx-auto">
+          <div className="bg-card rounded-xl p-5 sm:p-6 shadow-sm border border-border/50 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 max-w-xl mx-auto">
             <div className="flex items-start gap-3 sm:gap-4">
               <img src={esscaLogo} alt="ESSCA" className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg shrink-0 mt-0.5" />
               <div>
@@ -177,15 +177,15 @@ const Education = () => {
                 <p className="text-xs sm:text-sm text-muted-foreground mt-1">
                   {t("edu.degree")}
                 </p>
-                <p className="text-[11px] sm:text-xs text-muted-foreground mt-1">{t("edu.dates")}</p>
-                <p className="text-[11px] sm:text-xs font-medium text-accent mt-2">{t("edu.bde")}</p>
+                <p className="text-xs text-muted-foreground mt-1">{t("edu.dates")}</p>
+                <p className="text-xs font-medium text-accent mt-2">{t("edu.bde")}</p>
               </div>
             </div>
           </div>
         </ScrollReveal>
 
         <ScrollReveal delay={0.2}>
-          <h3 className="text-lg sm:text-xl font-semibold text-primary mt-12 sm:mt-16 mb-4 sm:mb-6 text-center">{t("edu.certs")}</h3>
+          <h3 className="text-lg sm:text-xl font-semibold text-primary mt-8 sm:mt-10 mb-4 sm:mb-5 text-center">{t("edu.certs")}</h3>
         </ScrollReveal>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 max-w-xl mx-auto">

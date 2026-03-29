@@ -102,7 +102,7 @@ const ExperienceCard = ({
             animate={{ rotateX: tilt.x, rotateY: tilt.y }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
             style={{ transformStyle: "preserve-3d" }}
-            className="w-full text-left bg-card rounded-xl p-4 sm:p-5 shadow-sm border border-border/50 cursor-pointer group hover:shadow-md hover:-translate-y-0.5 transition-[box-shadow,translate,border-color] duration-300 hover:border-accent/20"
+            className="w-full text-left bg-card rounded-xl p-5 sm:p-6 shadow-sm border border-border/50 cursor-pointer group hover:shadow-md hover:-translate-y-0.5 transition-[box-shadow,translate,border-color] duration-300 hover:border-accent/20"
           >
             <div className="flex items-start justify-between gap-2 sm:gap-3">
               <div className="flex items-start gap-2.5 sm:gap-3 min-w-0">
@@ -120,7 +120,7 @@ const ExperienceCard = ({
                       {title}
                     </h3>
                     {isCurrent && (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-600 border border-emerald-200/70 shrink-0">
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-600 border border-emerald-200/70 shrink-0">
                         <span className="relative flex h-1.5 w-1.5">
                           <span className="animate-pulse_dot absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75" />
                           <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500" />
@@ -146,11 +146,11 @@ const ExperienceCard = ({
                   </p>
                   <div className="flex items-center gap-2 mt-1 flex-wrap">
                     <span
-                      className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold border ${getTypeStyle(type)}`}
+                      className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold border ${getTypeStyle(type)}`}
                     >
                       {type}
                     </span>
-                    <span className="text-[11px] text-muted-foreground/70">{dates}</span>
+                    <span className="text-xs text-muted-foreground/70">{dates}</span>
                   </div>
                 </div>
               </div>
@@ -180,7 +180,7 @@ const ExperienceCard = ({
                   >
                     <div className="pt-3 sm:pt-4 border-t border-border/60 mt-3 sm:mt-4">
                       {/* Location */}
-                      <div className="inline-flex items-center gap-1.5 text-[11px] text-muted-foreground mb-3 bg-muted/40 rounded-full px-2.5 py-1">
+                      <div className="inline-flex items-center gap-1.5 text-xs text-muted-foreground mb-3 bg-muted/40 rounded-full px-2.5 py-1">
                         <MapPin size={11} className="text-accent" />
                         {location}
                       </div>
@@ -232,7 +232,7 @@ const ExperienceCard = ({
                                 damping: 22,
                               }}
                               whileHover={{ scale: 1.05 }}
-                              className="inline-flex items-center gap-1 px-2.5 sm:px-3 py-1 rounded-full text-[11px] sm:text-xs font-medium bg-accent text-accent-foreground hover:brightness-110 transition-all duration-200 shadow-sm"
+                              className="inline-flex items-center gap-1 px-2.5 sm:px-3 py-1 rounded-full text-xs font-medium bg-accent text-accent-foreground hover:brightness-110 transition-all duration-200 shadow-sm"
                               onClick={(e) => e.stopPropagation()}
                             >
                               {b.label}
@@ -249,7 +249,7 @@ const ExperienceCard = ({
                                 stiffness: 400,
                                 damping: 22,
                               }}
-                              className="px-2.5 sm:px-3 py-1 rounded-full text-[11px] sm:text-xs font-medium bg-accent/10 text-accent border border-accent/15"
+                              className="px-2.5 sm:px-3 py-1 rounded-full text-xs font-medium bg-accent/10 text-accent border border-accent/15"
                             >
                               {b.label}
                             </motion.span>
@@ -280,10 +280,10 @@ const ExperienceSection = () => {
   const lineScaleY = useTransform(scrollYProgress, [0, 1], [0, 1]);
 
   return (
-    <section id="experience" className="py-16 md:py-28 px-4 md:px-8 section-alt-bg">
+    <section id="experience" className="py-12 md:py-20 px-4 md:px-8 section-alt-bg">
       <div className="container mx-auto max-w-2xl">
         <ScrollReveal>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary mb-8 sm:mb-12 text-center">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary mb-6 sm:mb-8 text-center">
             {t("exp.title")}
           </h2>
         </ScrollReveal>

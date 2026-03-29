@@ -30,7 +30,7 @@ const Contact = () => {
     >
       {/* Gradient transition from white to dark */}
       <div className="h-20 md:h-28 bg-gradient-to-b from-background to-primary" />
-      <div className="py-16 md:py-24 px-4 md:px-8 bg-primary relative">
+      <div className="py-14 md:py-20 px-4 md:px-8 bg-primary relative">
       {/* Background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div
@@ -74,7 +74,7 @@ const Contact = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.55, delay: 0.08 }}
-          className="text-4xl md:text-5xl font-bold text-primary-foreground text-center mb-4 leading-tight tracking-tight"
+          className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary-foreground text-center mb-4 leading-tight tracking-tight"
         >
           {t("contact.title")}
         </motion.h2>
