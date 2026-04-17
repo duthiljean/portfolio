@@ -3,19 +3,40 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0a0a0a" />
+    <script>
+      // FOUC-prevention — apply theme class synchronously before render
+      (function () {
+        try {
+          var stored = localStorage.getItem("theme");
+          var theme = stored === "dark" || stored === "light"
+            ? stored
+            : (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+          if (theme === "dark") document.documentElement.classList.add("dark");
+          var meta = document.querySelector('meta[name="theme-color"]');
+          if (meta) meta.setAttribute("content", theme === "dark" ? "#0f0f0f" : "#0a0a0a");
+        } catch (e) { /* noop */ }
+      })();
+    </script>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="canonical" href="https://portfolio-bay-eta-88.vercel.app/" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <title>Jean Duthil — CV Interactif</title>
-    <meta name="description" content="CV interactif de Jean Duthil — Builder IA, Business Developer &amp; Product Thinker. En recherche d&#39;alternance à partir de septembre 2026.">
+    <title>Jean Duthil — Builder IA · Business Developer · Product Thinker</title>
+    <meta name="description" content="Portfolio de Jean Duthil — Builder IA, Business Developer &amp; Product Thinker. En recherche d'alternance à partir de septembre 2026 à Bordeaux." />
     <meta name="author" content="Jean Duthil" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="keywords" content="Jean Duthil, alternance, business developer, product, IA, AI builder, Roofwander, AdDetective, ESSCA, Bordeaux, septembre 2026" />
 
-    
-    
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
+    <meta property="og:locale" content="fr_FR" />
+    <meta property="og:locale:alternate" content="en_US" />
+    <meta property="og:site_name" content="Jean Duthil" />
     <meta property="og:url" content="https://portfolio-bay-eta-88.vercel.app/" />
-    <meta property="og:title" content="Jean Duthil — Portfolio" />
+    <meta property="og:title" content="Jean Duthil — Builder IA · Business Developer · Product Thinker" />
     <meta property="og:description" content="Builder IA · Business Developer · Product Thinker. En recherche d'alternance à partir de septembre 2026." />
     <meta property="og:image" content="https://portfolio-bay-eta-88.vercel.app/og-image.png" />
     <meta property="og:image:width" content="1200" />
@@ -24,9 +45,53 @@
 
     <!-- Twitter / WhatsApp -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Jean Duthil — Portfolio" />
+    <meta name="twitter:title" content="Jean Duthil — Builder IA · Business Developer · Product Thinker" />
     <meta name="twitter:description" content="Builder IA · Business Developer · Product Thinker. En recherche d'alternance à partir de septembre 2026." />
     <meta name="twitter:image" content="https://portfolio-bay-eta-88.vercel.app/og-image.png" />
+
+    <!-- Schema.org — Person -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "Jean Duthil",
+      "givenName": "Jean",
+      "familyName": "Duthil",
+      "url": "https://portfolio-bay-eta-88.vercel.app/",
+      "image": "https://portfolio-bay-eta-88.vercel.app/jean-duthil-photo.jpg",
+      "jobTitle": "Builder IA · Business Developer · Product Thinker",
+      "email": "mailto:jean.duthil13@gmail.com",
+      "telephone": "+33-7-60-04-90-11",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Bordeaux",
+        "addressCountry": "FR"
+      },
+      "sameAs": [
+        "https://linkedin.com/in/duthiljean",
+        "https://addetective.fr"
+      ],
+      "alumniOf": {
+        "@type": "CollegeOrUniversity",
+        "name": "ESSCA School of Management",
+        "url": "https://www.essca.fr/"
+      },
+      "knowsAbout": [
+        "Business Development",
+        "Product Management",
+        "Applied AI",
+        "SaaS Development",
+        "Growth Marketing"
+      ],
+      "knowsLanguage": ["French", "English", "Spanish"],
+      "seeks": {
+        "@type": "JobPosting",
+        "title": "Alternance Business Dev / Product / IA appliquée",
+        "jobStartDate": "2026-09-01",
+        "employmentType": "INTERN"
+      }
+    }
+    </script>
 </head>
 
   <body>

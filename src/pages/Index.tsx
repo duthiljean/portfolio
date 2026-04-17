@@ -3,6 +3,7 @@ import Hero from "@/components/Hero";
 import About from "@/components/About";
 import Skills from "@/components/Skills";
 import ExperienceSection from "@/components/ExperienceSection";
+import AddetectiveShowcase from "@/components/AddetectiveShowcase";
 import Education from "@/components/Education";
 import Contact, { Footer } from "@/components/Contact";
 import ScrollToTop from "@/components/ScrollToTop";
@@ -14,6 +15,7 @@ const Index = () => (
     <Hero />
     <About />
     <ExperienceSection />
+    <AddetectiveShowcase />
     <Education />
     <Skills />
     <Contact />
