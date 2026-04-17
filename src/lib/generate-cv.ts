@@ -34,7 +34,7 @@ const EXPERIENCES_FR: Exp[] = [
       "Prospection et closing de partenariats B2B avec revendeurs et marques outdoor",
       "Acquisition et onboarding de propriétaires sur la plateforme (growth)",
       "Structuration des process commerciaux et mise en place du CRM",
-      "Automatisations IA (Claude, Cursor) pour qualifier les leads et accélérer les ops",
+      "Automatisations IA (Claude, VS Code) pour qualifier les leads et accélérer les ops",
     ],
   },
   {
@@ -107,7 +107,7 @@ const EXPERIENCES_EN: Exp[] = [
       "Prospecting and closing B2B partnerships with retailers and outdoor brands",
       "Acquiring and onboarding owners onto the platform (growth)",
       "Structuring sales processes and CRM implementation",
-      "AI automations (Claude, Cursor) to qualify leads and speed up ops",
+      "AI automations (Claude, VS Code) to qualify leads and speed up ops",
     ],
   },
   {
@@ -200,7 +200,7 @@ const COPY = {
       { label: "Dev", value: "React · Vite · Supabase · Stripe · TypeScript · No-code" },
       { label: "IA", value: "Prompt engineering · Automatisations · Claude Code" },
     ] as SkillRow[],
-    tools: "Claude · ChatGPT · Gemini · Cursor · Claude Code",
+    tools: "Claude · ChatGPT · Gemini · VS Code · Claude Code",
     langs: [
       { label: "Français", level: "Natif" },
       { label: "Anglais", level: "B2" },
@@ -235,7 +235,7 @@ const COPY = {
       { label: "Dev", value: "React · Vite · Supabase · Stripe · TypeScript · No-code" },
       { label: "AI", value: "Prompt engineering · Automations · Claude Code" },
     ] as SkillRow[],
-    tools: "Claude · ChatGPT · Gemini · Cursor · Claude Code",
+    tools: "Claude · ChatGPT · Gemini · VS Code · Claude Code",
     langs: [
       { label: "French", level: "Native" },
       { label: "English", level: "B2" },

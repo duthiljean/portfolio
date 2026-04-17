@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import claudeLogo from "@/assets/claude-logo.png";
 import chatgptLogo from "@/assets/chatgpt-logo.png";
-import cursorLogo from "@/assets/cursor-logo.png";
+import vscodeLogo from "@/assets/vscode-logo.svg";
 import geminiLogo from "@/assets/gemini-logo.jpeg";
 import {
   Tooltip,
@@ -29,11 +29,11 @@ import { useLanguage } from "@/i18n/LanguageContext";
 const pillLogos: Record<string, string> = {
   Claude: claudeLogo,
   ChatGPT: chatgptLogo,
-  Cursor: cursorLogo,
+  "VS Code": vscodeLogo,
   Gemini: geminiLogo,
 };
 
-const dailyUseTools = new Set(["Claude", "ChatGPT", "Cursor", "Gemini"]);
+const dailyUseTools = new Set(["Claude", "ChatGPT", "VS Code", "Gemini"]);
 
 /* ─────────── Spotlight hook ─────────── */
 const useSpotlight = <T extends HTMLElement>() => {
@@ -153,7 +153,7 @@ const DailyStackCard = () => {
     { name: "Claude", logo: claudeLogo, use: "Raisonnement & code" },
     { name: "ChatGPT", logo: chatgptLogo, use: "Recherche & idées" },
     { name: "Gemini", logo: geminiLogo, use: "Analyse & synthèse" },
-    { name: "Cursor", logo: cursorLogo, use: "Éditeur IA" },
+    { name: "VS Code", logo: vscodeLogo, use: "Éditeur de code" },
   ];
 
   return (
@@ -356,7 +356,7 @@ const Skills = () => {
         { name: "Claude", tooltip: tooltipDaily },
         { name: "ChatGPT", tooltip: tooltipDaily },
         { name: "Gemini", tooltip: tooltipDaily },
-        { name: "Cursor", tooltip: tooltipDaily },
+        { name: "VS Code", tooltip: tooltipDaily },
         { name: "Claude Code", tooltip: tooltipProject },
         { name: "GitHub", tooltip: tooltipProject },
         { name: "Prompt Engineering", tooltip: tooltipProject },
