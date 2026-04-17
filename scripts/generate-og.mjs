@@ -1,213 +1,193 @@
+// Renders the OG image (1200×630) to public/og-image.png using headless Chromium.
+// Run: node scripts/generate-og.mjs
+
 import { chromium } from "@playwright/test";
-import { readFileSync } from "fs";
-import { join, dirname } from "path";
-import { fileURLToPath } from "url";
+import { writeFileSync } from "node:fs";
+import { join, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const photoB64 = readFileSync(join(__dirname, "../public/jean-duthil-photo.jpg")).toString("base64");
-const photoSrc = `data:image/jpeg;base64,${photoB64}`;
+const OUT = join(__dirname, "..", "public", "og-image.png");
 
-const html = `<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8" />
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    width: 1200px;
-    height: 630px;
-    font-family: 'Inter', system-ui, sans-serif;
-    background: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    position: relative;
-  }
+const html = /* html */ `<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      html, body { width: 1200px; height: 630px; background: #0a0a0a; }
+      body {
+        font-family: "Inter", -apple-system, system-ui, sans-serif;
+        color: #fafafa;
+        -webkit-font-smoothing: antialiased;
+        font-feature-settings: "cv11", "ss01", "ss03";
+        position: relative;
+        overflow: hidden;
+      }
 
-  /* Background gradient */
-  .bg {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, hsl(210 100% 97%), #fff, hsl(217 91% 60% / 0.06), hsl(210 100% 97%));
-  }
+      /* Dot-grid — faint, masked toward center-left */
+      .grid {
+        position: absolute; inset: 0;
+        background-image: radial-gradient(circle, rgba(255,255,255,0.08) 1px, transparent 1px);
+        background-size: 28px 28px;
+        -webkit-mask-image: radial-gradient(ellipse 85% 70% at 35% 50%, #000 0%, #000 35%, transparent 85%);
+                mask-image: radial-gradient(ellipse 85% 70% at 35% 50%, #000 0%, #000 35%, transparent 85%);
+      }
 
-  /* Blobs */
-  .blob1 {
-    position: absolute;
-    top: -80px; left: -120px;
-    width: 420px; height: 420px;
-    background: hsl(217 91% 60% / 0.10);
-    border-radius: 50%;
-    filter: blur(60px);
-  }
-  .blob2 {
-    position: absolute;
-    bottom: -80px; right: -120px;
-    width: 480px; height: 480px;
-    background: hsl(211 53% 24% / 0.06);
-    border-radius: 50%;
-    filter: blur(70px);
-  }
+      /* Ambient vignette */
+      .glow {
+        position: absolute; inset: 0;
+        background: radial-gradient(ellipse 60% 50% at 25% 45%, rgba(255,255,255,0.045), transparent 65%);
+      }
 
-  .content {
-    position: relative;
-    z-index: 10;
-    display: flex;
-    align-items: center;
-    gap: 80px;
-    padding: 0 90px;
-    width: 100%;
-  }
+      /* Frame */
+      .frame {
+        position: absolute; inset: 20px;
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 24px;
+      }
 
-  /* Photo */
-  .photo-wrapper {
-    position: relative;
-    flex-shrink: 0;
-  }
-  .photo-glow {
-    position: absolute;
-    inset: -8px;
-    border-radius: 50%;
-    background: hsl(217 91% 60% / 0.25);
-    filter: blur(20px);
-  }
-  .photo-ring {
-    position: relative;
-    padding: 4px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, hsl(217 91% 60% / 0.8), hsl(211 53% 24% / 0.7), hsl(213 94% 68% / 0.9));
-  }
-  .photo-border {
-    padding: 3px;
-    border-radius: 50%;
-    background: #fff;
-  }
-  .photo-ring img {
-    width: 148px;
-    height: 148px;
-    border-radius: 50%;
-    object-fit: cover;
-    object-position: top;
-    display: block;
-  }
+      /* Brand */
+      .brand {
+        position: absolute; top: 54px; left: 64px;
+        display: flex; align-items: center; gap: 12px;
+        color: rgba(255,255,255,0.72);
+        font-size: 14px; font-weight: 500;
+        letter-spacing: -0.01em;
+      }
+      .jd {
+        width: 34px; height: 34px; border-radius: 9px;
+        background: #fafafa; color: #0a0a0a;
+        display: inline-flex; align-items: center; justify-content: center;
+        font-size: 13px; font-weight: 700; letter-spacing: -0.02em;
+      }
+      .brand .sep {
+        width: 1px; height: 14px; background: rgba(255,255,255,0.16);
+      }
 
-  /* Text */
-  .text { flex: 1; }
+      /* Availability pill */
+      .pill {
+        position: absolute; top: 54px; right: 64px;
+        display: inline-flex; align-items: center; gap: 8px;
+        padding: 7px 14px;
+        border: 1px solid rgba(255,255,255,0.14);
+        border-radius: 999px;
+        background: rgba(255,255,255,0.04);
+        font-size: 12px; font-weight: 500;
+        color: rgba(255,255,255,0.8);
+        letter-spacing: 0.02em;
+      }
+      .dot-wrap { position: relative; width: 7px; height: 7px; }
+      .dot-pulse {
+        position: absolute; inset: 0; border-radius: 999px;
+        background: #34d399; opacity: 0.55; transform: scale(1.6);
+      }
+      .dot-core {
+        position: relative; width: 7px; height: 7px; border-radius: 999px;
+        background: #10b981;
+      }
 
-  .name {
-    font-size: 64px;
-    font-weight: 900;
-    letter-spacing: -2px;
-    line-height: 1.0;
-    background: linear-gradient(135deg, hsl(211 53% 24%), hsl(217 91% 60%));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin-bottom: 14px;
-  }
+      /* Center stack */
+      .stack {
+        position: absolute; left: 64px; right: 64px; top: 180px;
+      }
+      h1 {
+        font-size: 132px; font-weight: 700;
+        letter-spacing: -0.045em;
+        line-height: 0.94;
+        background: linear-gradient(180deg, #ffffff 0%, #bfbfbf 100%);
+        -webkit-background-clip: text;
+                background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      .tagline {
+        margin-top: 28px;
+        font-size: 28px; font-weight: 500;
+        letter-spacing: -0.015em;
+        color: rgba(255,255,255,0.78);
+        display: inline-flex; align-items: center; gap: 14px;
+      }
+      .tagline .bullet {
+        width: 4px; height: 4px; border-radius: 999px;
+        background: rgba(255,255,255,0.35);
+      }
+      .tagline em {
+        font-style: normal; color: #fafafa; font-weight: 600;
+      }
 
-  .roles {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 22px;
-    flex-wrap: wrap;
-  }
-  .role {
-    font-size: 17px;
-    font-weight: 600;
-    color: hsl(215 16% 47%);
-  }
-  .role-sep {
-    font-size: 17px;
-    color: hsl(217 91% 60% / 0.5);
-    font-weight: 400;
-  }
+      /* Footer line */
+      .foot {
+        position: absolute; left: 64px; right: 64px; bottom: 54px;
+        display: flex; align-items: center; justify-content: space-between;
+        color: rgba(255,255,255,0.5);
+        font-size: 13px; font-weight: 500;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+      .foot .group { display: inline-flex; align-items: center; gap: 10px; }
+      .foot .rule { width: 48px; height: 1px; background: rgba(255,255,255,0.2); }
+      .arrow {
+        font-size: 18px; color: rgba(255,255,255,0.7);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="grid"></div>
+    <div class="glow"></div>
+    <div class="frame"></div>
 
-  .badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: hsl(120 60% 95%);
-    border: 1.5px solid hsl(142 60% 80%);
-    border-radius: 100px;
-    padding: 8px 18px;
-    font-size: 15px;
-    font-weight: 600;
-    color: hsl(142 60% 28%);
-    margin-bottom: 22px;
-  }
-  .badge-dot {
-    width: 9px; height: 9px;
-    border-radius: 50%;
-    background: hsl(142 60% 42%);
-    flex-shrink: 0;
-  }
+    <div class="brand">
+      <span class="jd">JD</span>
+      <span>Jean Duthil</span>
+      <span class="sep"></span>
+      <span>Portfolio</span>
+    </div>
 
-  .meta {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-size: 14px;
-    color: hsl(215 16% 55%);
-  }
-  .meta-sep { color: hsl(214 32% 85%); }
-  .meta-url {
-    font-weight: 600;
-    color: hsl(217 91% 60%);
-  }
-</style>
-</head>
-<body>
-  <div class="bg"></div>
-  <div class="blob1"></div>
-  <div class="blob2"></div>
+    <div class="pill">
+      <span class="dot-wrap">
+        <span class="dot-pulse"></span>
+        <span class="dot-core"></span>
+      </span>
+      Dispo dès sept. 2026
+    </div>
 
-  <div class="content">
-    <div class="photo-wrapper">
-      <div class="photo-glow"></div>
-      <div class="photo-ring">
-        <div class="photo-border">
-          <img src="${photoSrc}" alt="Jean Duthil" />
-        </div>
+    <div class="stack">
+      <h1>Jean<br>Duthil</h1>
+      <div class="tagline">
+        <em>Builder IA</em>
+        <span class="bullet"></span>
+        <em>Business Developer</em>
+        <span class="bullet"></span>
+        <em>Product Thinker</em>
       </div>
     </div>
 
-    <div class="text">
-      <div class="name">Jean Duthil</div>
-
-      <div class="roles">
-        <span class="role">Builder IA</span>
-        <span class="role-sep">·</span>
-        <span class="role">Business Developer</span>
-        <span class="role-sep">·</span>
-        <span class="role">Product Thinker</span>
+    <div class="foot">
+      <div class="group">
+        <span class="rule"></span>
+        <span>Alternance · Bordeaux</span>
       </div>
-
-      <div class="badge">
-        <div class="badge-dot"></div>
-        Recherche alternance — Septembre 2026
-      </div>
-
-      <div class="meta">
-        <span>Bordeaux, France</span>
-        <span class="meta-sep">·</span>
-        <span class="meta-url">portfolio-bay-eta-88.vercel.app</span>
+      <div class="group">
+        <span>jeanduthil.com</span>
+        <span class="arrow">↗</span>
       </div>
     </div>
-  </div>
-</body>
+  </body>
 </html>`;
 
 const browser = await chromium.launch();
-const page = await browser.newPage();
-await page.setViewportSize({ width: 1200, height: 630 });
-await page.setContent(html, { waitUntil: "networkidle" });
-await page.screenshot({
-  path: join(__dirname, "../public/og-image.png"),
-  clip: { x: 0, y: 0, width: 1200, height: 630 },
+const context = await browser.newContext({
+  viewport: { width: 1200, height: 630 },
 });
+const page = await context.newPage();
+await page.setContent(html, { waitUntil: "networkidle" });
+await page.evaluate(async () => {
+  if (document.fonts && document.fonts.ready) await document.fonts.ready;
+});
+const buffer = await page.screenshot({ type: "png", omitBackground: false });
+writeFileSync(OUT, buffer);
 await browser.close();
-console.log("✓ og-image.png générée (1200×630)");
+console.log(`✓ OG image written to ${OUT}`);
