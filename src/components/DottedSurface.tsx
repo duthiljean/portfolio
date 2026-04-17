@@ -149,43 +149,39 @@ export const DottedSurface = ({ className = "" }: { className?: string }) => {
       targetIntensity = 1;
     };
 
-    type DOEventCtor = typeof DeviceOrientationEvent & {
-      requestPermission?: () => Promise<"granted" | "denied" | "default">;
+    /* ---------- Mobile: finger touch → world raycast ---------- */
+    const handleTouchMove = (e: TouchEvent) => {
+      const t = e.touches[0];
+      if (!t) return;
+      const rect = renderer.domElement.getBoundingClientRect();
+      const x = t.clientX - rect.left;
+      const y = t.clientY - rect.top;
+      if (x < 0 || y < 0 || x > rect.width || y > rect.height) return;
+      ndc.x = (x / rect.width) * 2 - 1;
+      ndc.y = -((y / rect.height) * 2 - 1);
+      raycaster.setFromCamera(ndc, camera);
+      if (raycaster.ray.intersectPlane(plane, hitPoint)) {
+        targetCursor.x = hitPoint.x;
+        targetCursor.y = hitPoint.z;
+        targetIntensity = 1;
+      }
     };
 
-    const enableOrientation = () => {
+    const handleTouchEnd = () => {
+      targetIntensity = 0;
+    };
+
+    if (isCoarse) {
+      // deviceorientation: attached directly — no permission prompt.
+      // Works silently on iOS (events fire with null values when permission
+      // isn't granted; we ignore null), works on Android.
       window.addEventListener("deviceorientation", handleOrientation, {
         passive: true,
       });
-    };
-
-    let iosPermissionPrompt: (() => void) | null = null;
-
-    if (isCoarse) {
-      const DOE = (typeof DeviceOrientationEvent !== "undefined"
-        ? DeviceOrientationEvent
-        : null) as DOEventCtor | null;
-
-      if (DOE && typeof DOE.requestPermission === "function") {
-        // iOS 13+ — permission must come from a user gesture, so attach
-        // a one-shot touch listener that requests it and then hooks up.
-        iosPermissionPrompt = () => {
-          DOE.requestPermission!()
-            .then((state) => {
-              if (state === "granted") enableOrientation();
-            })
-            .catch(() => {
-              /* user denied or context insecure — silently fall back */
-            });
-        };
-        window.addEventListener("touchstart", iosPermissionPrompt, {
-          once: true,
-          passive: true,
-        });
-      } else {
-        // Android / other: just listen, events flow without permission.
-        enableOrientation();
-      }
+      // touchmove: universal mobile input, no permission required.
+      window.addEventListener("touchmove", handleTouchMove, { passive: true });
+      window.addEventListener("touchend", handleTouchEnd, { passive: true });
+      window.addEventListener("touchcancel", handleTouchEnd, { passive: true });
     } else {
       window.addEventListener("pointermove", handlePointerMove, {
         passive: true,
@@ -270,9 +266,9 @@ export const DottedSurface = ({ className = "" }: { className?: string }) => {
       themeObserver.disconnect();
       if (isCoarse) {
         window.removeEventListener("deviceorientation", handleOrientation);
-        if (iosPermissionPrompt) {
-          window.removeEventListener("touchstart", iosPermissionPrompt);
-        }
+        window.removeEventListener("touchmove", handleTouchMove);
+        window.removeEventListener("touchend", handleTouchEnd);
+        window.removeEventListener("touchcancel", handleTouchEnd);
       } else {
         window.removeEventListener("pointermove", handlePointerMove);
         window.removeEventListener("pointerleave", handlePointerLeave);
