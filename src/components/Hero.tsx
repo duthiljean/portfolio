@@ -1,30 +1,18 @@
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
-import { ArrowDown, ArrowRight, Mail, Linkedin } from "lucide-react";
+import { useState, useEffect, lazy, Suspense, Component, type ReactNode } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowRight, Mail, Linkedin, ArrowDown } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageContext";
-import { useTilt } from "@/hooks/use-tilt";
+import { Button } from "@/components/ui/button";
 
-const nameText = "Jean Duthil";
+const DottedSurface = lazy(() =>
+  import("./DottedSurface").then((m) => ({ default: m.DottedSurface })),
+);
 
-const WordReveal = ({ text, className }: { text: string; className?: string }) => {
-  const words = text.split(" ");
-  return (
-    <span className={className}>
-      {words.map((word, i) => (
-        <span key={i} className="inline-block overflow-hidden mr-[0.3em] last:mr-0">
-          <motion.span
-            className="inline-block"
-            initial={{ y: "110%", rotateX: 40 }}
-            animate={{ y: "0%", rotateX: 0 }}
-            transition={{ duration: 0.55, delay: 0.1 + i * 0.09, ease: [0.16, 1, 0.3, 1] }}
-          >
-            {word}
-          </motion.span>
-        </span>
-      ))}
-    </span>
-  );
-};
+class WebGLErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean }> {
+  state = { hasError: false };
+  static getDerivedStateFromError() { return { hasError: true }; }
+  render() { return this.state.hasError ? null : this.props.children; }
+}
 
 const RoleCarousel = () => {
   const { t } = useLanguage();
@@ -39,181 +27,190 @@ const RoleCarousel = () => {
   }, [roles.length]);
 
   return (
-    <div className="flex flex-col items-center gap-1">
-      <div className="h-8 md:h-10 relative overflow-hidden w-full">
-        <AnimatePresence mode="wait">
-          <motion.span
-            key={roles[index]}
-            initial={{ y: 28, opacity: 0, filter: "blur(6px)" }}
-            animate={{ y: 0, opacity: 1, filter: "blur(0px)" }}
-            exit={{ y: -28, opacity: 0, filter: "blur(6px)" }}
-            transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-            className="absolute inset-x-0 text-lg sm:text-xl md:text-2xl font-semibold text-foreground"
-          >
-            {roles[index]}
-          </motion.span>
-        </AnimatePresence>
-      </div>
-      {/* Underline animé qui se déploie à chaque changement de rôle */}
-      <motion.div
-        key={`ul-${index}`}
-        className="h-px w-16 bg-gradient-to-r from-transparent via-accent to-transparent rounded-full"
-        initial={{ scaleX: 0, opacity: 0 }}
-        animate={{ scaleX: 1, opacity: 1 }}
-        transition={{ duration: 0.5, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
-      />
+    <div className="h-7 relative overflow-hidden inline-block min-w-[180px]">
+      <AnimatePresence mode="wait">
+        <motion.span
+          key={roles[index]}
+          initial={{ y: 18, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: -18, opacity: 0 }}
+          transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+          className="absolute inset-x-0 text-sm md:text-base font-medium text-foreground"
+        >
+          {roles[index]}
+        </motion.span>
+      </AnimatePresence>
     </div>
   );
 };
 
 const Hero = () => {
   const { t } = useLanguage();
-  const { ref, tilt, onMouseMove, onMouseLeave } = useTilt(10);
 
   return (
     <section
       id="hero"
-      className="min-h-[100svh] flex items-center justify-center px-4 pt-14 pb-6 relative overflow-hidden"
+      className="relative min-h-[100svh] flex items-center justify-center px-5 md:px-8 pt-24 pb-16 overflow-hidden"
     >
-      {/* Fond gradient animé */}
-      <div className="absolute inset-0 hero-gradient" />
-
-      {/* Blobs flottants — CSS only for GPU compositing */}
-      <div className="absolute top-20 -left-32 w-64 md:w-96 h-64 md:h-96 bg-accent/8 rounded-full blur-3xl pointer-events-none will-change-transform animate-blob-1" />
-      <div className="absolute bottom-20 -right-32 w-64 md:w-96 h-64 md:h-96 bg-primary/5 rounded-full blur-3xl pointer-events-none will-change-transform animate-blob-2" />
-
-      <div className="container mx-auto text-center max-w-3xl relative z-10">
-
-        {/* Photo */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.85 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-          className="mb-4"
-        >
-          <div
-            ref={ref}
-            onMouseMove={onMouseMove}
-            onMouseLeave={onMouseLeave}
-            className="relative inline-block"
-            style={{ perspective: "500px" }}
+      {/* WebGL dotted surface — ambient, scoped to Hero */}
+      <div
+        aria-hidden
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          maskImage:
+            "radial-gradient(ellipse at center, #000 0%, #000 55%, transparent 95%)",
+          WebkitMaskImage:
+            "radial-gradient(ellipse at center, #000 0%, #000 55%, transparent 95%)",
+        }}
+      >
+        <WebGLErrorBoundary>
+          <Suspense
+            fallback={
+              <div
+                className="absolute inset-0 dot-grid-bg opacity-30"
+              />
+            }
           >
-            {/* Glow ambiant */}
-            <div className="absolute inset-0 rounded-full bg-accent/20 blur-xl scale-125 pointer-events-none" />
-            {/* Anneau gradient */}
-            <div className="relative p-[3px] rounded-full bg-gradient-to-br from-accent/70 via-accent to-primary/50 shadow-lg">
-              <div className="p-[2px] rounded-full bg-background">
-                <motion.img
-                  src="/jean-duthil-photo.jpg"
-                  alt="Jean Duthil"
-                  loading="eager"
-                  className="w-20 h-20 sm:w-24 sm:h-24 md:w-32 md:h-32 rounded-full object-cover object-top block"
-                  animate={{
-                    rotateX: tilt.x,
-                    rotateY: tilt.y,
-                    scale: tilt.x !== 0 || tilt.y !== 0 ? 1.04 : 1,
-                  }}
-                  transition={{ type: "spring", stiffness: 200, damping: 20 }}
-                />
-              </div>
+            <DottedSurface />
+          </Suspense>
+        </WebGLErrorBoundary>
+      </div>
+
+      <div className="container mx-auto max-w-4xl relative">
+        <div className="flex flex-col items-center text-center">
+          {/* Availability badge */}
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs font-medium text-muted-foreground shadow-sm"
+          >
+            <span className="relative flex h-1.5 w-1.5">
+              <span className="animate-pulse_dot absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
+            </span>
+            {t("hero.badge")}
+          </motion.div>
+
+          {/* Photo */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+            className="mt-8"
+          >
+            <div className="relative w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden border border-border shadow-sm">
+              <img
+                src="/jean-duthil-photo.jpg"
+                alt="Jean Duthil"
+                loading="eager"
+                className="w-full h-full object-cover object-top"
+              />
             </div>
-          </div>
-        </motion.div>
+          </motion.div>
 
-        {/* Nom */}
-        <h1 className="text-4xl sm:text-5xl md:text-7xl font-extrabold tracking-tight leading-[1.05] text-gradient">
-          <WordReveal text={nameText} />
-        </h1>
-
-        {/* Carousel de rôles */}
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.28, ease: [0.16, 1, 0.3, 1] }}
-          className="mt-3 md:mt-4"
-        >
-          <RoleCarousel />
-        </motion.div>
-
-        {/* Badge disponibilité */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.4, delay: 0.38, ease: [0.16, 1, 0.3, 1] }}
-          className="mt-5 md:mt-6 inline-flex items-center gap-2 rounded-full bg-green-50 border border-green-200 px-4 md:px-5 py-2 md:py-2.5 text-xs md:text-sm font-medium text-green-700"
-        >
-          <span className="relative flex h-2 w-2 md:h-2.5 md:w-2.5 shrink-0">
-            <span className="animate-pulse_dot absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
-            <span className="relative inline-flex rounded-full h-2 w-2 md:h-2.5 md:w-2.5 bg-green-500" />
-          </span>
-          {t("hero.badge")}
-        </motion.div>
-
-        {/* CTAs */}
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.48, ease: [0.16, 1, 0.3, 1] }}
-          className="mt-6 md:mt-8 flex flex-col sm:flex-row gap-3 justify-center px-4 sm:px-0"
-        >
-          <a
-            href="#about"
-            className="inline-flex items-center justify-center gap-2 px-7 py-3 rounded-xl bg-primary text-primary-foreground font-semibold text-sm shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-[0.97] transition-all duration-200"
+          {/* Name */}
+          <motion.h1
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            className="mt-7 text-5xl sm:text-6xl md:text-7xl font-semibold tracking-[-0.04em] leading-[1] text-foreground"
           >
-            {t("hero.cta1")}
-            <ArrowRight size={15} className="shrink-0" />
-          </a>
-          <a
-            href="#contact"
-            className="inline-flex items-center justify-center gap-2 px-7 py-3 rounded-xl border-2 border-primary/20 text-primary font-semibold text-sm hover:border-primary hover:bg-primary hover:text-primary-foreground active:scale-[0.97] transition-all duration-200"
-          >
-            <Mail size={15} className="shrink-0" />
-            {t("hero.cta2")}
-          </a>
-        </motion.div>
+            Jean Duthil
+          </motion.h1>
 
-        {/* Liens sociaux */}
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.58, ease: [0.16, 1, 0.3, 1] }}
-          className="mt-4 flex items-center justify-center gap-2"
-        >
-          <a
-            href="https://linkedin.com/in/duthiljean"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-medium text-muted-foreground border border-border/50 bg-card/60 hover:text-accent hover:border-accent/30 hover:bg-card transition-all duration-200 shadow-sm"
+          {/* Role */}
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.35, ease: [0.16, 1, 0.3, 1] }}
+            className="mt-5 text-muted-foreground flex items-center gap-1.5 text-sm md:text-base"
           >
-            <Linkedin size={14} />
-            LinkedIn
-          </a>
-          <span className="w-px h-4 bg-border/60" />
-          <a
-            href="mailto:jean.duthil13@gmail.com"
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-medium text-muted-foreground border border-border/50 bg-card/60 hover:text-accent hover:border-accent/30 hover:bg-card transition-all duration-200 shadow-sm"
-          >
-            <Mail size={14} />
-            jean.duthil13@gmail.com
-          </a>
-        </motion.div>
+            <RoleCarousel />
+          </motion.div>
 
-        {/* Flèche bas */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.7, duration: 0.5 }}
-          className="mt-8 md:mt-10"
-        >
+          {/* Subtitle */}
+          <motion.p
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.45, ease: [0.16, 1, 0.3, 1] }}
+            className="mt-4 max-w-xl text-sm md:text-base text-muted-foreground leading-relaxed"
+            style={{ textWrap: "balance" } as React.CSSProperties}
+          >
+            {t("hero.dateline")}
+          </motion.p>
+
+          {/* CTAs */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.55, ease: [0.16, 1, 0.3, 1] }}
+            className="mt-9 flex flex-col sm:flex-row gap-2.5 w-full sm:w-auto"
+          >
+            <Button
+              size="lg"
+              onClick={() => {
+                document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
+              }}
+              className="shimmer-border h-11 px-5 rounded-full bg-foreground text-background hover:bg-foreground/90 text-sm font-medium gap-2 shadow-sm"
+            >
+              <Mail size={15} />
+              {t("hero.cta2")}
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              onClick={() => {
+                document.getElementById("about")?.scrollIntoView({ behavior: "smooth" });
+              }}
+              className="h-11 px-5 rounded-full border-border bg-card hover:bg-muted hover:text-foreground text-foreground text-sm font-medium gap-1.5"
+            >
+              {t("hero.cta1")}
+              <ArrowRight size={15} />
+            </Button>
+          </motion.div>
+
+          {/* Social inline */}
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.7, ease: [0.16, 1, 0.3, 1] }}
+            className="mt-10 flex items-center gap-5 text-xs text-muted-foreground"
+          >
+            <a
+              href="https://linkedin.com/in/duthiljean"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 hover:text-foreground transition-colors"
+            >
+              <Linkedin size={13} />
+              LinkedIn
+            </a>
+            <span className="w-px h-3 bg-border" aria-hidden />
+            <a
+              href="mailto:jean.duthil13@gmail.com"
+              className="inline-flex items-center gap-1.5 hover:text-foreground transition-colors"
+            >
+              <Mail size={13} />
+              jean.duthil13@gmail.com
+            </a>
+          </motion.div>
+
+          {/* Scroll indicator */}
           <motion.a
             href="#about"
-            animate={{ y: [0, 8, 0] }}
-            transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
-            className="inline-flex text-muted-foreground/40 hover:text-accent transition-colors"
+            aria-label="Scroll to about"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1, y: [0, 6, 0] }}
+            transition={{
+              opacity: { duration: 0.4, delay: 1 },
+              y: { repeat: Infinity, duration: 2, ease: "easeInOut" },
+            }}
+            className="mt-14 text-muted-foreground/40 hover:text-foreground transition-colors"
           >
-            <ArrowDown size={20} />
+            <ArrowDown size={18} />
           </motion.a>
-        </motion.div>
+        </div>
       </div>
     </section>
   );

@@ -27,6 +27,7 @@ const translations: Record<Lang, Record<string, string>> = {
 
     // Hero
     "hero.badge": "Recherche alternance — Septembre 2026",
+    "hero.dateline": "Marseille · Bordeaux · Bruxelles · ’26",
     "hero.cta1": "Voir mon parcours",
     "hero.cta2": "Me contacter",
     "hero.role1": "Builder IA",
@@ -35,6 +36,13 @@ const translations: Record<Lang, Record<string, string>> = {
 
     // About
     "about.title": "À propos",
+    "about.kicker": "À PROPOS",
+    "about.dateline": "BORDEAUX — BRUXELLES — 2026",
+    "about.headline1": "Construire des produits.",
+    "about.headline2": "Développer des activités.",
+    "about.headline3": "Avec l'IA comme levier.",
+    "about.bio":
+      "Actuellement en stage chez Roofwander à Bruxelles, j'ai aussi lancé AdDetective — un SaaS d'analyse d'annonces propulsé par l'IA. De la prospection à la mise en production.",
     "about.description":
       "Je conçois des produits et développe des activités en utilisant l'IA comme levier — de la prospection à la mise en production. Actuellement en stage chez Roofwander, j'ai aussi lancé AdDetective, un SaaS d'analyse d'annonces propulsé par l'IA.",
     "about.location": "Bordeaux, France",
@@ -42,11 +50,18 @@ const translations: Record<Lang, Record<string, string>> = {
     "about.rhythm": "Rythme : 2 sem. entreprise / 1 sem. école",
     "about.languages": "Français (natif) · Anglais (B2) · Espagnol (B1)",
     "about.stat1": "locations gérées",
-    "about.stat2": "bateaux managés",
+    "about.stat2": "bateaux gérés",
     "about.stat3": "produits construits avec l'IA",
+    "about.now_label": "EN CE MOMENT",
+    "about.now_1_title": "Roofwander",
+    "about.now_1_desc": "Business Dev · Bruxelles",
+    "about.now_2_title": "AdDetective",
+    "about.now_2_desc": "SaaS IA · solo",
 
     // Experience
     "exp.title": "Expériences",
+    "exp.current": "En cours",
+    "exp.entries_label": "ENTRÉES",
 
     // Experience entries
     "exp.roofwander.title": "Business Developer & Partnerships",
@@ -119,6 +134,8 @@ const translations: Record<Lang, Record<string, string>> = {
 
     // Education
     "edu.title": "Formation",
+    "edu.dateline": "1 DIPLÔME · 3 CERTIFICATIONS",
+    "edu.degree_kicker": "BACHELOR · INTERNATIONAL BUSINESS",
     "edu.degree": "Bachelor en Management International — International Business",
     "edu.dates": "2023 — 2026",
     "edu.bde": "VP du Bureau Des Étudiants",
@@ -128,7 +145,9 @@ const translations: Record<Lang, Record<string, string>> = {
     "edu.ai.org": "Compétences et Métiers · 2024",
 
     // Skills
-    "skills.title": "Ce que je sais faire",
+    "skills.title": "Ce que je sais faire.",
+    "skills.kicker": "COMPÉTENCES",
+    "skills.dateline": "3 AXES · USAGE QUOTIDIEN",
     "skills.subtitle": "Construire, développer et optimiser des produits en utilisant l'IA comme levier.",
     "skills.cat1.title": "Construire avec l'IA",
     "skills.cat1.desc": "Outils maîtrisés au quotidien pour concevoir et expédier.",
@@ -158,6 +177,7 @@ const translations: Record<Lang, Record<string, string>> = {
 
     // Hero
     "hero.badge": "Looking for an internship — September 2026",
+    "hero.dateline": "Marseille · Bordeaux · Brussels · ’26",
     "hero.cta1": "View my background",
     "hero.cta2": "Contact me",
     "hero.role1": "AI Builder",
@@ -166,6 +186,13 @@ const translations: Record<Lang, Record<string, string>> = {
 
     // About
     "about.title": "About",
+    "about.kicker": "ABOUT",
+    "about.dateline": "BORDEAUX — BRUSSELS — 2026",
+    "about.headline1": "Build products.",
+    "about.headline2": "Grow businesses.",
+    "about.headline3": "With AI as the lever.",
+    "about.bio":
+      "Currently interning at Roofwander in Brussels, I also launched AdDetective — an AI-powered listing analysis SaaS. From prospecting to production.",
     "about.description":
       "I build products and grow businesses using AI as a lever — from prospecting to production. Currently interning at Roofwander, I also launched AdDetective, an AI-powered listing analysis SaaS.",
     "about.location": "Bordeaux, France",
@@ -175,9 +202,16 @@ const translations: Record<Lang, Record<string, string>> = {
     "about.stat1": "rentals managed",
     "about.stat2": "boats managed",
     "about.stat3": "products built with AI",
+    "about.now_label": "CURRENTLY",
+    "about.now_1_title": "Roofwander",
+    "about.now_1_desc": "Business Dev · Brussels",
+    "about.now_2_title": "AdDetective",
+    "about.now_2_desc": "AI SaaS · solo",
 
     // Experience
     "exp.title": "Experience",
+    "exp.current": "Current",
+    "exp.entries_label": "ENTRIES",
 
     "exp.roofwander.title": "Business Developer & Partnerships",
     "exp.roofwander.type": "Internship",
@@ -249,6 +283,8 @@ const translations: Record<Lang, Record<string, string>> = {
 
     // Education
     "edu.title": "Education",
+    "edu.dateline": "1 DEGREE · 3 CERTIFICATIONS",
+    "edu.degree_kicker": "BACHELOR · INTERNATIONAL BUSINESS",
     "edu.degree": "Bachelor in International Management — International Business",
     "edu.dates": "2023 — 2026",
     "edu.bde": "VP of the Student Union",
@@ -258,7 +294,9 @@ const translations: Record<Lang, Record<string, string>> = {
     "edu.ai.org": "Compétences et Métiers · 2024",
 
     // Skills
-    "skills.title": "What I can do",
+    "skills.title": "What I can do.",
+    "skills.kicker": "CAPABILITIES",
+    "skills.dateline": "3 AXES · DAILY USE",
     "skills.subtitle": "Build, grow and optimize products using AI as a lever.",
     "skills.cat1.title": "Build with AI",
     "skills.cat1.desc": "Tools mastered daily to design and ship.",
