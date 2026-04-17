@@ -87,7 +87,12 @@ export const DottedSurface = ({ className = "" }: { className?: string }) => {
     const points = new THREE.Points(geometry, material);
     scene.add(points);
 
-    // Cursor tracking — raycast onto y=0 plane for world-space coords
+    // Pointer vs tilt: coarse-pointer devices (phones) have no cursor, so we
+    // drive the ripple from deviceorientation instead.
+    const isCoarse =
+      typeof window.matchMedia === "function" &&
+      window.matchMedia("(pointer: coarse)").matches;
+
     const raycaster = new THREE.Raycaster();
     const ndc = new THREE.Vector2();
     const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
@@ -97,6 +102,7 @@ export const DottedSurface = ({ className = "" }: { className?: string }) => {
     let targetIntensity = 0;
     let intensity = 0;
 
+    /* ---------- Desktop: cursor → world raycast ---------- */
     const handlePointerMove = (e: PointerEvent) => {
       const rect = renderer.domElement.getBoundingClientRect();
       const x = e.clientX - rect.left;
@@ -119,9 +125,74 @@ export const DottedSurface = ({ className = "" }: { className?: string }) => {
       targetIntensity = 0;
     };
 
-    window.addEventListener("pointermove", handlePointerMove, { passive: true });
-    window.addEventListener("pointerleave", handlePointerLeave);
-    window.addEventListener("blur", handlePointerLeave);
+    /* ---------- Mobile: device tilt (gamma=roll, beta=pitch) ---------- */
+    let baselineBeta: number | null = null;
+    let baselineGamma: number | null = null;
+    const TILT_RANGE_DEG = 28; // ±28° from baseline maps to full ripple reach
+    const MAX_X = HALF_W * 0.55; // don't push ripple past the visible area
+    const MAX_Y = HALF_H * 0.55;
+    const clamp = (v: number, a: number, b: number) =>
+      v < a ? a : v > b ? b : v;
+
+    const handleOrientation = (e: DeviceOrientationEvent) => {
+      if (e.beta == null || e.gamma == null) return;
+      if (baselineBeta === null || baselineGamma === null) {
+        baselineBeta = e.beta;
+        baselineGamma = e.gamma;
+        return;
+      }
+      const dBeta = clamp((e.beta - baselineBeta) / TILT_RANGE_DEG, -1, 1);
+      const dGamma = clamp((e.gamma - baselineGamma) / TILT_RANGE_DEG, -1, 1);
+      // Gamma (left/right) → world X. Beta (forward/back) → world Z.
+      targetCursor.x = dGamma * MAX_X;
+      targetCursor.y = -dBeta * MAX_Y;
+      targetIntensity = 1;
+    };
+
+    type DOEventCtor = typeof DeviceOrientationEvent & {
+      requestPermission?: () => Promise<"granted" | "denied" | "default">;
+    };
+
+    const enableOrientation = () => {
+      window.addEventListener("deviceorientation", handleOrientation, {
+        passive: true,
+      });
+    };
+
+    let iosPermissionPrompt: (() => void) | null = null;
+
+    if (isCoarse) {
+      const DOE = (typeof DeviceOrientationEvent !== "undefined"
+        ? DeviceOrientationEvent
+        : null) as DOEventCtor | null;
+
+      if (DOE && typeof DOE.requestPermission === "function") {
+        // iOS 13+ — permission must come from a user gesture, so attach
+        // a one-shot touch listener that requests it and then hooks up.
+        iosPermissionPrompt = () => {
+          DOE.requestPermission!()
+            .then((state) => {
+              if (state === "granted") enableOrientation();
+            })
+            .catch(() => {
+              /* user denied or context insecure — silently fall back */
+            });
+        };
+        window.addEventListener("touchstart", iosPermissionPrompt, {
+          once: true,
+          passive: true,
+        });
+      } else {
+        // Android / other: just listen, events flow without permission.
+        enableOrientation();
+      }
+    } else {
+      window.addEventListener("pointermove", handlePointerMove, {
+        passive: true,
+      });
+      window.addEventListener("pointerleave", handlePointerLeave);
+      window.addEventListener("blur", handlePointerLeave);
+    }
 
     let count = 0;
     let raf = 0;
@@ -197,9 +268,16 @@ export const DottedSurface = ({ className = "" }: { className?: string }) => {
       cancelAnimationFrame(raf);
       ro.disconnect();
       themeObserver.disconnect();
-      window.removeEventListener("pointermove", handlePointerMove);
-      window.removeEventListener("pointerleave", handlePointerLeave);
-      window.removeEventListener("blur", handlePointerLeave);
+      if (isCoarse) {
+        window.removeEventListener("deviceorientation", handleOrientation);
+        if (iosPermissionPrompt) {
+          window.removeEventListener("touchstart", iosPermissionPrompt);
+        }
+      } else {
+        window.removeEventListener("pointermove", handlePointerMove);
+        window.removeEventListener("pointerleave", handlePointerLeave);
+        window.removeEventListener("blur", handlePointerLeave);
+      }
       geometry.dispose();
       material.dispose();
       renderer.dispose();
