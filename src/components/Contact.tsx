@@ -165,12 +165,12 @@ const EmailHero = ({ mailto }: { mailto: string }) => {
             type="button"
             onClick={handleCopy}
             aria-label="Copier l'email"
-            className="group/email mt-6 flex items-start gap-2 text-left"
+            className="group/email mt-6 flex items-start gap-2 text-left w-full min-w-0"
           >
-            <span className="text-2xl md:text-[32px] font-semibold tracking-[-0.025em] break-all text-foreground leading-tight">
+            <span className="min-w-0 flex-1 text-[18px] sm:text-2xl md:text-[32px] font-semibold tracking-[-0.02em] [overflow-wrap:anywhere] text-foreground leading-tight">
               {EMAIL}
             </span>
-            <span className="mt-1.5 md:mt-2 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-border bg-card text-muted-foreground group-hover/email:border-foreground/30 group-hover/email:text-foreground transition-colors">
+            <span className="mt-1 md:mt-2 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-border bg-card text-muted-foreground group-hover/email:border-foreground/30 group-hover/email:text-foreground transition-colors">
               <AnimatePresence mode="wait" initial={false}>
                 {copied ? (
                   <motion.span

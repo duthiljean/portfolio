@@ -175,7 +175,7 @@ const Hero = () => {
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.7, ease: [0.16, 1, 0.3, 1] }}
-            className="mt-10 flex items-center gap-5 text-xs text-muted-foreground"
+            className="mt-10 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-muted-foreground"
           >
             <a
               href="https://linkedin.com/in/duthiljean"
