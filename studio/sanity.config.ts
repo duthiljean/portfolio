@@ -6,6 +6,12 @@ import {schemaTypes} from './schemaTypes'
 
 const SINGLETONS = ['profile', 'about', 'skillsSection', 'education'] as const
 
+const isLocalStudio =
+  typeof window !== 'undefined' && window.location.hostname === 'localhost'
+const PREVIEW_ORIGIN = isLocalStudio
+  ? 'http://localhost:8080'
+  : 'https://portfolio-bay-eta-88.vercel.app'
+
 export default defineConfig({
   name: 'default',
   title: 'sanity-studio-jean',
@@ -41,7 +47,7 @@ export default defineConfig({
     }),
     presentationTool({
       previewUrl: {
-        origin: 'http://localhost:8080',
+        origin: PREVIEW_ORIGIN,
       },
     }),
     visionTool(),
