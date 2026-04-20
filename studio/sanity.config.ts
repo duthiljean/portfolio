@@ -1,6 +1,6 @@
 import {defineConfig} from 'sanity'
 import {structureTool} from 'sanity/structure'
-import {presentationTool} from 'sanity/presentation'
+import {presentationTool, defineLocations} from 'sanity/presentation'
 import {visionTool} from '@sanity/vision'
 import {schemaTypes} from './schemaTypes'
 
@@ -48,6 +48,40 @@ export default defineConfig({
     presentationTool({
       previewUrl: {
         origin: PREVIEW_ORIGIN,
+      },
+      resolve: {
+        mainDocuments: [
+          {route: '/', filter: `_id == "profile"`},
+        ],
+        locations: {
+          profile: defineLocations({
+            locations: [{title: 'Hero', href: '/#hero'}],
+            message: 'Section d’accueil',
+          }),
+          about: defineLocations({
+            locations: [{title: 'À propos', href: '/#about'}],
+            message: 'Section à propos',
+          }),
+          skillsSection: defineLocations({
+            locations: [{title: 'Compétences', href: '/#skills'}],
+            message: 'Section compétences',
+          }),
+          education: defineLocations({
+            locations: [{title: 'Formation', href: '/#education'}],
+            message: 'Section formation',
+          }),
+          experience: defineLocations({
+            select: {title: 'title', company: 'company'},
+            resolve: (doc) => ({
+              locations: [
+                {
+                  title: doc?.title ? `${doc.title} · ${doc.company ?? ''}` : 'Expérience',
+                  href: '/#experience',
+                },
+              ],
+            }),
+          }),
+        },
       },
     }),
     visionTool(),
