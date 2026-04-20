@@ -8,20 +8,26 @@ import {
   Sparkle,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useQuery } from "@tanstack/react-query";
 import esscaLogo from "@/assets/essca-logo.jpeg";
 import moocCert from "@/assets/mooc-creative-box-cert.webp";
 import anthropicLogo from "@/assets/anthropic-logo.png";
 import competencesMetiersLogo from "@/assets/competences-metiers-logo.jpeg";
 import { useLanguage } from "@/i18n/LanguageContext";
+import {
+  fetchEducation,
+  pickLocale,
+  type Education as EducationDoc,
+  type Certification,
+  type Degree,
+} from "@/lib/sanity";
 
-/* ─────────── Sub-certifications ─────────── */
-const anthropicCerts = [
-  { title: "Claude 101", link: "https://verify.skilljar.com/c/3r3qkq4786i3" },
-  { title: "Claude Code in Action", link: "https://verify.skilljar.com/c/fgsjkvmybimm" },
-  { title: "Introduction to Claude Cowork", link: "https://verify.skilljar.com/c/5dmj2uzcgpku" },
-];
+const FALLBACK_LOGOS: Record<string, string> = {
+  anthropic: anthropicLogo,
+  mooc: esscaLogo,
+  simple: competencesMetiersLogo,
+};
 
-/* ─────────── Spotlight hook ─────────── */
 const useSpotlight = <T extends HTMLElement>() => {
   const ref = useRef<T>(null);
   const onPointerMove = (e: React.PointerEvent<T>) => {
@@ -35,27 +41,43 @@ const useSpotlight = <T extends HTMLElement>() => {
   return { ref, onPointerMove };
 };
 
-/* ─────────── Progress bar — animated degree timeline ─────────── */
-const DegreeProgress = ({ lang }: { lang: "fr" | "en" }) => {
+const DegreeProgress = ({
+  lang,
+  startDate,
+  endDate,
+}: {
+  lang: "fr" | "en";
+  startDate?: string;
+  endDate?: string;
+}) => {
   const progress = useMemo(() => {
-    const start = new Date(2023, 8, 1).getTime(); // Sept 1, 2023
-    const end = new Date(2026, 5, 30).getTime(); // June 30, 2026
+    const start = startDate ? new Date(startDate).getTime() : new Date(2023, 8, 1).getTime();
+    const end = endDate ? new Date(endDate).getTime() : new Date(2026, 5, 30).getTime();
     const now = Date.now();
     return Math.min(1, Math.max(0, (now - start) / (end - start)));
-  }, []);
+  }, [startDate, endDate]);
 
   const pct = progress * 100;
   const done = progress >= 1;
+
+  const formatDate = (d?: string, fallback?: string) => {
+    if (!d) return fallback ?? "";
+    const date = new Date(d);
+    const month = date.toLocaleString(lang === "fr" ? "fr-FR" : "en-US", {
+      month: "short",
+    });
+    return `${month}. ${date.getFullYear()}`;
+  };
 
   return (
     <div className="w-full">
       <div className="flex items-center justify-between text-[10px] font-medium uppercase tracking-wider text-muted-foreground tabular-nums mb-2.5">
         <span className="inline-flex items-center gap-1.5">
           <span className="h-1 w-1 rounded-full bg-foreground/60" />
-          {lang === "fr" ? "Sept. 2023" : "Sept. 2023"}
+          {formatDate(startDate, "Sept. 2023")}
         </span>
         <span className="inline-flex items-center gap-1.5">
-          {lang === "fr" ? "Juin 2026" : "June 2026"}
+          {formatDate(endDate, lang === "fr" ? "Juin 2026" : "June 2026")}
           <span className="h-1 w-1 rounded-full bg-foreground/60" />
         </span>
       </div>
@@ -112,10 +134,19 @@ const DegreeProgress = ({ lang }: { lang: "fr" | "en" }) => {
   );
 };
 
-/* ─────────── Degree card — full width hero ─────────── */
-const DegreeCard = () => {
-  const { t, lang } = useLanguage();
+const DegreeCard = ({
+  degree,
+  lang,
+}: {
+  degree: Degree;
+  lang: "fr" | "en";
+}) => {
   const { ref, onPointerMove } = useSpotlight<HTMLDivElement>();
+  const kicker = pickLocale(degree.kicker, lang);
+  const name = pickLocale(degree.name, lang);
+  const durationLabel = pickLocale(degree.durationLabel, lang);
+  const bdeLabel = pickLocale(degree.bdeLabel, lang);
+  const logoSrc = degree.schoolLogo || esscaLogo;
 
   return (
     <motion.div
@@ -127,23 +158,19 @@ const DegreeCard = () => {
       transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
       className="saas-card saas-card-hover card-spotlight group relative overflow-hidden p-6 md:p-8"
     >
-      {/* Dot grid ambient */}
       <div
         aria-hidden
         className="absolute inset-0 dot-grid-bg opacity-30 pointer-events-none"
         style={{
-          maskImage:
-            "radial-gradient(ellipse at top right, #000 0%, transparent 65%)",
-          WebkitMaskImage:
-            "radial-gradient(ellipse at top right, #000 0%, transparent 65%)",
+          maskImage: "radial-gradient(ellipse at top right, #000 0%, transparent 65%)",
+          WebkitMaskImage: "radial-gradient(ellipse at top right, #000 0%, transparent 65%)",
         }}
       />
 
       <div className="relative grid grid-cols-1 md:grid-cols-[1fr_auto] gap-6 md:gap-10 items-start">
-        {/* Left: school + degree */}
         <div className="flex items-start gap-4">
           <motion.img
-            src={esscaLogo}
+            src={logoSrc}
             alt=""
             aria-hidden
             className="w-12 h-12 md:w-14 md:h-14 rounded-xl border border-border shrink-0 object-cover"
@@ -157,99 +184,77 @@ const DegreeCard = () => {
                 strokeWidth={2}
                 className="transition-transform duration-300 group-hover:-rotate-6"
               />
-              {t("edu.degree_kicker")}
+              {kicker}
             </div>
             <h3 className="mt-2 text-xl md:text-2xl font-semibold text-foreground leading-tight tracking-[-0.025em]">
-              ESSCA School of Management
+              {degree.schoolName}
             </h3>
             <p
               className="mt-2 text-sm text-muted-foreground leading-relaxed max-w-md"
               style={{ textWrap: "pretty" } as React.CSSProperties}
             >
-              {t("edu.degree")}
+              {name}
             </p>
           </div>
         </div>
 
-        {/* Right: dates */}
         <div className="md:text-right shrink-0">
           <div className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
             {lang === "fr" ? "Promotion" : "Class of"}
           </div>
           <div className="mt-1.5 text-3xl md:text-4xl font-semibold tabular-nums tracking-[-0.035em] leading-none text-foreground">
-            {t("edu.dates")}
+            {degree.datesLabel}
           </div>
-          <div className="mt-2 text-xs text-muted-foreground">
-            {lang === "fr" ? "Bachelor · 3 ans" : "Bachelor · 3 years"}
-          </div>
+          <div className="mt-2 text-xs text-muted-foreground">{durationLabel}</div>
         </div>
       </div>
 
-      {/* Progress bar */}
       <div className="relative mt-7 md:mt-8 pt-6 border-t border-border">
-        <DegreeProgress lang={lang as "fr" | "en"} />
+        <DegreeProgress
+          lang={lang}
+          startDate={degree.startDate}
+          endDate={degree.endDate}
+        />
       </div>
 
-      {/* BDE footer chip */}
       <div className="relative mt-6 flex flex-wrap items-center gap-2">
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-2.5 py-1 text-[11px] font-medium text-foreground transition-colors group-hover:border-foreground/20">
-          <Award size={11} className="text-foreground" />
-          {t("edu.bde")}
-        </span>
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-2.5 py-1 text-[11px] font-medium text-muted-foreground">
-          Bordeaux, FR
-        </span>
+        {bdeLabel && (
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-2.5 py-1 text-[11px] font-medium text-foreground transition-colors group-hover:border-foreground/20">
+            <Award size={11} className="text-foreground" />
+            {bdeLabel}
+          </span>
+        )}
+        {degree.location && (
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-2.5 py-1 text-[11px] font-medium text-muted-foreground">
+            {degree.location}
+          </span>
+        )}
       </div>
     </motion.div>
   );
 };
 
-/* ─────────── Certification card ─────────── */
-type CertKind = "anthropic" | "mooc" | "ai";
-
 const CertCard = ({
-  kind,
+  cert,
   isOpen,
   onToggle,
   index,
+  lang,
 }: {
-  kind: CertKind;
+  cert: Certification;
   isOpen: boolean;
   onToggle: () => void;
   index: number;
+  lang: "fr" | "en";
 }) => {
-  const { t, lang } = useLanguage();
   const { ref, onPointerMove } = useSpotlight<HTMLDivElement>();
 
-  const config = {
-    anthropic: {
-      logo: anthropicLogo,
-      name: "Anthropic",
-      org: t("edu.anthropic.count"),
-      badge: { label: "3", tone: "foreground" as const },
-      verified: true,
-      expandable: true,
-    },
-    mooc: {
-      logo: esscaLogo,
-      name: "MOOC Creative Box",
-      org: t("edu.mooc.org"),
-      badge: null,
-      verified: true,
-      expandable: true,
-    },
-    ai: {
-      logo: competencesMetiersLogo,
-      name: "AI Training — Prompt Engineering",
-      org: t("edu.ai.org"),
-      badge: null,
-      verified: false,
-      expandable: false,
-    },
-  }[kind];
+  const logoSrc = cert.logo || FALLBACK_LOGOS[cert.kind];
+  const expandable = cert.kind === "anthropic" || cert.kind === "mooc";
+  const subCertsCount = cert.subCerts?.length ?? 0;
 
-  const panelId = `cert-panel-${kind}`;
-  const buttonId = `cert-button-${kind}`;
+  const panelId = `cert-panel-${cert._key ?? index}`;
+  const buttonId = `cert-button-${cert._key ?? index}`;
 
   const Header = (
     <div className="flex items-start gap-3">
@@ -259,7 +264,7 @@ const CertCard = ({
         className="shrink-0"
       >
         <img
-          src={config.logo}
+          src={logoSrc}
           alt=""
           aria-hidden
           className="w-10 h-10 rounded-lg border border-border object-cover"
@@ -268,9 +273,9 @@ const CertCard = ({
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-1.5 flex-wrap">
           <h4 className="text-sm font-semibold text-foreground leading-tight">
-            {config.name}
+            {cert.name}
           </h4>
-          {config.verified && (
+          {cert.verified && (
             <BadgeCheck
               size={13}
               className="text-foreground shrink-0"
@@ -279,16 +284,16 @@ const CertCard = ({
           )}
         </div>
         <p className="text-xs text-muted-foreground mt-1 leading-tight">
-          {config.org}
+          {pickLocale(cert.org, lang)}
         </p>
       </div>
       <div className="flex items-center gap-2 shrink-0">
-        {config.badge && (
+        {cert.kind === "anthropic" && subCertsCount > 0 && (
           <span className="inline-flex items-center justify-center min-w-[22px] h-[22px] px-1.5 rounded-full bg-foreground text-background text-[11px] font-semibold tabular-nums">
-            {config.badge.label}
+            {subCertsCount}
           </span>
         )}
-        {config.expandable && (
+        {expandable && (
           <motion.div
             animate={{
               rotate: isOpen ? 180 : 0,
@@ -319,7 +324,7 @@ const CertCard = ({
           : "saas-card-hover"
       }`}
     >
-      {config.expandable ? (
+      {expandable ? (
         <button
           id={buttonId}
           onClick={onToggle}
@@ -334,7 +339,7 @@ const CertCard = ({
       )}
 
       <AnimatePresence initial={false}>
-        {isOpen && config.expandable && (
+        {isOpen && expandable && (
           <motion.div
             id={panelId}
             role="region"
@@ -361,12 +366,12 @@ const CertCard = ({
             <div className="px-5 pb-5">
               <div className="h-px bg-border mb-4" />
 
-              {kind === "anthropic" && (
+              {cert.kind === "anthropic" && cert.subCerts && (
                 <div className="flex flex-wrap gap-1.5">
-                  {anthropicCerts.map((c, i) => (
+                  {cert.subCerts.map((c, i) => (
                     <motion.a
-                      key={c.title}
-                      href={c.link}
+                      key={c._key ?? c.title}
+                      href={c.url}
                       target="_blank"
                       rel="noopener noreferrer"
                       initial={{ opacity: 0, x: -6 }}
@@ -388,7 +393,7 @@ const CertCard = ({
                 </div>
               )}
 
-              {kind === "mooc" && (
+              {cert.kind === "mooc" && (
                 <motion.div
                   initial={{ opacity: 0, y: 6 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -396,8 +401,8 @@ const CertCard = ({
                   className="overflow-hidden rounded-lg border border-border"
                 >
                   <img
-                    src={moocCert}
-                    alt="MOOC Creative Box certificate"
+                    src={cert.certImage || moocCert}
+                    alt="Certificate"
                     loading="lazy"
                     className="w-full block transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:scale-[1.02]"
                   />
@@ -411,12 +416,21 @@ const CertCard = ({
   );
 };
 
-/* ─────────── Education section ─────────── */
 const Education = () => {
-  const { t, lang } = useLanguage();
+  const { lang } = useLanguage();
   const [openCert, setOpenCert] = useState<string | null>(null);
 
-  const certs: CertKind[] = ["anthropic", "mooc", "ai"];
+  const { data: education } = useQuery<EducationDoc | null>({
+    queryKey: ["education"],
+    queryFn: fetchEducation,
+  });
+
+  if (!education) return null;
+
+  const title = pickLocale(education.title, lang);
+  const dateline = pickLocale(education.dateline, lang);
+  const certsLabel = pickLocale(education.certsLabel, lang);
+  const certifications = education.certifications ?? [];
 
   return (
     <section
@@ -424,7 +438,6 @@ const Education = () => {
       className="relative py-16 sm:py-20 md:py-28 px-5 md:px-8 section-alt-bg border-t border-border"
     >
       <div className="container mx-auto max-w-5xl">
-        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -432,51 +445,66 @@ const Education = () => {
           transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
           className="max-w-2xl"
         >
-          <div className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-2.5 py-1 text-[11px] font-medium text-muted-foreground mb-5">
-            <span className="h-1 w-1 rounded-full bg-foreground/60" />
-            {t("edu.title")}
+          {title && (
+            <div className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-2.5 py-1 text-[11px] font-medium text-muted-foreground mb-5">
+              <span className="h-1 w-1 rounded-full bg-foreground/60" />
+              {title}
+            </div>
+          )}
+          {title && (
+            <h2 className="text-3xl md:text-5xl font-semibold tracking-[-0.035em] leading-[1.05] text-foreground">
+              {title}
+            </h2>
+          )}
+          {dateline && (
+            <p className="mt-4 text-base text-muted-foreground leading-relaxed">
+              {dateline}
+            </p>
+          )}
+        </motion.div>
+
+        {education.degree && (
+          <div className="mt-10 md:mt-14">
+            <DegreeCard degree={education.degree} lang={lang as "fr" | "en"} />
           </div>
-          <h2 className="text-3xl md:text-5xl font-semibold tracking-[-0.035em] leading-[1.05] text-foreground">
-            {t("edu.title")}
-          </h2>
-          <p className="mt-4 text-base text-muted-foreground leading-relaxed">
-            {t("edu.dateline")}
-          </p>
-        </motion.div>
+        )}
 
-        {/* Degree hero card */}
-        <div className="mt-10 md:mt-14">
-          <DegreeCard />
-        </div>
+        {certifications.length > 0 && (
+          <>
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+              className="mt-8 md:mt-10 flex items-baseline justify-between gap-4"
+            >
+              <h3 className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                {certsLabel}
+              </h3>
+              <span className="text-[11px] text-muted-foreground tabular-nums">
+                {certifications.length} ·{" "}
+                {certifications.reduce((acc, c) => acc + (c.subCerts?.length ?? 1), 0)}{" "}
+                {lang === "fr" ? "programmes" : "programs"}
+              </span>
+            </motion.div>
 
-        {/* Certifications header */}
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-          className="mt-8 md:mt-10 flex items-baseline justify-between gap-4"
-        >
-          <h3 className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-            {t("edu.certs")}
-          </h3>
-          <span className="text-[11px] text-muted-foreground tabular-nums">
-            {certs.length} · 5 {lang === "fr" ? "programmes" : "programs"}
-          </span>
-        </motion.div>
-
-        {/* Cert grid */}
-        <div className="mt-3 md:mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
-          {certs.map((kind, i) => (
-            <CertCard
-              key={kind}
-              kind={kind}
-              index={i}
-              isOpen={openCert === kind}
-              onToggle={() => setOpenCert(openCert === kind ? null : kind)}
-            />
-          ))}
-        </div>
+            <div className="mt-3 md:mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+              {certifications.map((cert, i) => {
+                const id = cert._key ?? String(i);
+                return (
+                  <CertCard
+                    key={id}
+                    cert={cert}
+                    index={i}
+                    isOpen={openCert === id}
+                    onToggle={() => setOpenCert(openCert === id ? null : id)}
+                    lang={lang as "fr" | "en"}
+                  />
+                );
+              })}
+            </div>
+          </>
+        )}
       </div>
     </section>
   );

@@ -1,19 +1,10 @@
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState, useEffect } from "react";
 import { ChevronDown, MapPin, ArrowUpRight } from "lucide-react";
 import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 import { track } from "@vercel/analytics";
-import { experiences } from "./experienceData";
+import { experiences as localExperiences } from "./experienceData";
+import { fetchExperiences, type Experience as SanityExperience } from "@/lib/sanity";
 import { useLanguage } from "@/i18n/LanguageContext";
-
-const expKeys = [
-  "roofwander",
-  "addetective",
-  "adayboat",
-  "zeboat",
-  "bde",
-  "coquille",
-  "armees",
-];
 
 type FilterId = "all" | "pro" | "project" | "asso";
 
@@ -36,7 +27,22 @@ const categoryOf = (rawType: string): Exclude<FilterId, "all"> => {
   return "asso";
 };
 
-/* ─────────── Spotlight hook (no tilt — expandable cards) ─────────── */
+// Fallback local logos by company name — used until logos are uploaded in Sanity
+const logoFallback = localExperiences.reduce<Record<string, string | undefined>>(
+  (acc, e) => {
+    acc[e.company] = e.logo;
+    return acc;
+  },
+  {},
+);
+const imageFallback = localExperiences.reduce<Record<string, string | undefined>>(
+  (acc, e) => {
+    acc[e.company] = e.image;
+    return acc;
+  },
+  {},
+);
+
 const useSpotlight = () => {
   const ref = useRef<HTMLDivElement>(null);
   const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
@@ -50,40 +56,28 @@ const useSpotlight = () => {
   return { ref, onPointerMove };
 };
 
-/* ─────────── ExperienceCard ─────────── */
 const ExperienceCard = ({
   exp,
-  expKey,
   isOpen,
   onToggle,
-  index,
 }: {
-  exp: (typeof experiences)[0];
-  expKey: string;
+  exp: SanityExperience;
   isOpen: boolean;
   onToggle: () => void;
-  index: number;
 }) => {
   const { t } = useLanguage();
   const { ref, onPointerMove } = useSpotlight();
 
-  const title = t(`exp.${expKey}.title`);
-  const type = t(`exp.${expKey}.type`);
-  const dates = t(`exp.${expKey}.dates`);
-  const location = t(`exp.${expKey}.location`);
-  const description = t(`exp.${expKey}.description`);
-  const isCurrent = dates.includes("Présent") || dates.includes("Present");
+  const logoUrl = exp.logo?.asset?.url ?? logoFallback[exp.company];
+  const imageUrl = exp.image?.asset?.url ?? imageFallback[exp.company];
 
-  const badges = exp.badges.map((b, i) => ({
-    ...b,
-    label: t(`exp.${expKey}.badge${i + 1}`) || b.label,
-  }));
+  const isCurrent = exp.dates.includes("Présent") || exp.dates.includes("Present");
 
-  const panelId = `exp-panel-${expKey}`;
-  const buttonId = `exp-button-${expKey}`;
+  const panelId = `exp-panel-${exp._id}`;
+  const buttonId = `exp-button-${exp._id}`;
 
   // Split description: first line = summary, "→" lines = bullets
-  const lines = description.split("\n");
+  const lines = exp.description.split("\n");
   const summary = !lines[0]?.startsWith("→") ? lines[0] : null;
   const bullets = lines
     .slice(summary ? 1 : 0)
@@ -108,7 +102,6 @@ const ExperienceCard = ({
           : "saas-card-hover"
       }`}
     >
-      {/* Active accent — 2px left bar on current role */}
       {isCurrent && (
         <span
           aria-hidden
@@ -123,11 +116,10 @@ const ExperienceCard = ({
         aria-controls={panelId}
         className="relative w-full text-left p-5 md:p-6 flex items-start gap-4 cursor-pointer"
       >
-        {/* Logo with hover scale */}
         <div className="relative w-10 h-10 shrink-0">
-          {exp.logo ? (
+          {logoUrl ? (
             <motion.img
-              src={exp.logo}
+              src={logoUrl}
               alt=""
               aria-hidden
               loading="lazy"
@@ -146,7 +138,7 @@ const ExperienceCard = ({
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2 flex-wrap">
                 <h3 className="font-semibold text-sm md:text-base text-foreground leading-tight">
-                  {title}
+                  {exp.title}
                 </h3>
                 {isCurrent && (
                   <span
@@ -162,15 +154,15 @@ const ExperienceCard = ({
               <p className="text-sm text-muted-foreground mt-1">
                 <span className="text-foreground/75 font-medium">{exp.company}</span>
                 <span className="mx-1.5 text-border">·</span>
-                <span>{location}</span>
+                <span>{exp.location}</span>
               </p>
 
               <div className="mt-2.5 flex items-center gap-2 flex-wrap">
                 <span className="inline-flex items-center rounded-md px-1.5 py-0.5 text-[10.5px] font-medium bg-muted text-foreground">
-                  {type}
+                  {exp.type}
                 </span>
                 <span className="text-[11px] text-muted-foreground tabular-nums">
-                  {dates}
+                  {exp.dates}
                 </span>
               </div>
             </div>
@@ -217,7 +209,6 @@ const ExperienceCard = ({
             <div className="px-5 md:px-6 pb-6 md:pb-7 pl-16 md:pl-[68px]">
               <div className="h-px bg-border mb-5" />
 
-              {/* Summary — stands out */}
               {summary && (
                 <motion.p
                   initial={{ opacity: 0, y: 6 }}
@@ -229,7 +220,6 @@ const ExperienceCard = ({
                 </motion.p>
               )}
 
-              {/* Bullets — staggered arrow list */}
               {bullets.length > 0 && (
                 <ul className="space-y-2">
                   {bullets.map((b, li) => (
@@ -256,7 +246,7 @@ const ExperienceCard = ({
                 </ul>
               )}
 
-              {exp.image && (
+              {imageUrl && (
                 <motion.div
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -268,7 +258,7 @@ const ExperienceCard = ({
                   className="mt-4 overflow-hidden rounded-lg border border-border"
                 >
                   <img
-                    src={exp.image}
+                    src={imageUrl}
                     alt={exp.company}
                     loading="lazy"
                     className="w-full block transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:scale-[1.02]"
@@ -276,7 +266,6 @@ const ExperienceCard = ({
                 </motion.div>
               )}
 
-              {/* Footer: badges + site link */}
               <motion.div
                 initial={{ opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -287,10 +276,10 @@ const ExperienceCard = ({
                 }}
                 className="flex flex-wrap gap-1.5 mt-4 items-center"
               >
-                {badges.map((b) =>
+                {(exp.badges ?? []).map((b) =>
                   b.link ? (
                     <a
-                      key={b.label}
+                      key={b._key ?? b.label}
                       href={b.link}
                       target="_blank"
                       rel="noopener noreferrer"
@@ -301,7 +290,7 @@ const ExperienceCard = ({
                     </a>
                   ) : (
                     <span
-                      key={b.label}
+                      key={b._key ?? b.label}
                       className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-medium border border-border text-muted-foreground transition-colors hover:border-foreground/20 hover:text-foreground"
                     >
                       {b.label}
@@ -336,7 +325,6 @@ const ExperienceCard = ({
   );
 };
 
-/* ─────────── FilterTabs ─────────── */
 const FilterTabs = ({
   filter,
   setFilter,
@@ -394,21 +382,32 @@ const FilterTabs = ({
   );
 };
 
-/* ─────────── ExperienceSection ─────────── */
 const ExperienceSection = () => {
   const { t, lang } = useLanguage();
   const [filter, setFilter] = useState<FilterId>("all");
-  const [openKey, setOpenKey] = useState<string | null>(expKeys[0]);
+  const [experiences, setExperiences] = useState<SanityExperience[]>([]);
+  const [openId, setOpenId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchExperiences()
+      .then((data) => {
+        setExperiences(data);
+        if (data.length > 0) setOpenId(data[0]._id);
+      })
+      .catch((err) => {
+        console.error("[Sanity] Failed to fetch experiences:", err);
+      })
+      .finally(() => setLoading(false));
+  }, []);
 
   const enriched = useMemo(
     () =>
-      experiences.map((exp, idx) => {
-        const key = expKeys[idx];
-        const type = t(`exp.${key}.type`);
-        return { exp, key, type, category: categoryOf(type) };
-      }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [lang],
+      experiences.map((exp) => ({
+        exp,
+        category: categoryOf(exp.type),
+      })),
+    [experiences],
   );
 
   const counts: Record<FilterId, number> = useMemo(
@@ -438,7 +437,6 @@ const ExperienceSection = () => {
       className="relative py-16 sm:py-20 md:py-28 px-5 md:px-8 border-t border-border"
     >
       <div className="container mx-auto max-w-5xl">
-        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -458,7 +456,6 @@ const ExperienceSection = () => {
           </p>
         </motion.div>
 
-        {/* Filter tabs */}
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -476,25 +473,22 @@ const ExperienceSection = () => {
           </LayoutGroup>
         </motion.div>
 
-        {/* Cards — animated reordering on filter change */}
         <LayoutGroup id="exp-list">
           <motion.div className="mt-6 md:mt-8 flex flex-col gap-2.5 md:gap-3">
             <AnimatePresence initial={false} mode="popLayout">
-              {visible.map(({ exp, key }, idx) => (
+              {visible.map(({ exp }) => (
                 <ExperienceCard
-                  key={key}
+                  key={exp._id}
                   exp={exp}
-                  expKey={key}
-                  index={idx}
-                  isOpen={openKey === key}
-                  onToggle={() => setOpenKey(openKey === key ? null : key)}
+                  isOpen={openId === exp._id}
+                  onToggle={() => setOpenId(openId === exp._id ? null : exp._id)}
                 />
               ))}
             </AnimatePresence>
           </motion.div>
         </LayoutGroup>
 
-        {visible.length === 0 && (
+        {!loading && visible.length === 0 && (
           <p className="mt-10 text-sm text-muted-foreground">
             {lang === "fr" ? "Aucune expérience dans ce filtre." : "No experience in this filter."}
           </p>

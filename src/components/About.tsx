@@ -18,9 +18,30 @@ import {
   Repeat,
   ArrowUpRight,
 } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import { useLanguage } from "@/i18n/LanguageContext";
+import {
+  fetchAbout,
+  fetchProfile,
+  pickLocale,
+  type About as AboutDoc,
+  type AboutStat,
+  type Profile,
+} from "@/lib/sanity";
 
-/* ─────────────── Counter ─────────────── */
+const STAT_ICONS = [Target, Zap];
+const STAT_TRENDS = [
+  [8, 20, 45, 90, 145, 210, 260, 315, 360, 400],
+  [0, 1, 3, 6, 9, 13, 18, 22, 27, 30],
+];
+
+const parseStatValue = (raw: string | undefined): { value: number; suffix: string } => {
+  if (!raw) return { value: 0, suffix: "" };
+  const match = raw.match(/^([\d.]+)(.*)$/);
+  if (!match) return { value: 0, suffix: raw };
+  return { value: parseFloat(match[1]) || 0, suffix: match[2] };
+};
+
 const Counter = ({
   target,
   suffix,
@@ -57,7 +78,6 @@ const Counter = ({
   );
 };
 
-/* ─────────────── useTilt — spotlight + 3D tilt hook ─────────────── */
 const SPRING = { stiffness: 140, damping: 18, mass: 0.6 };
 
 const useTilt = (maxTilt: number = 4) => {
@@ -104,7 +124,6 @@ const useTilt = (maxTilt: number = 4) => {
   };
 };
 
-/* ─────────────── Sparkline ─────────────── */
 const Sparkline = ({
   points,
   isInView,
@@ -165,7 +184,6 @@ const Sparkline = ({
         animate={isInView ? { pathLength: 1 } : {}}
         transition={{ duration: 1.4, delay, ease: [0.16, 1, 0.3, 1] }}
       />
-      {/* End-point dot — reveals on card hover */}
       <g className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
         <circle
           cx={last.x}
@@ -182,35 +200,38 @@ const Sparkline = ({
   );
 };
 
-/* ─────────────── PhotoCard with parallax ─────────────── */
 const PhotoCard = ({
   mx,
   my,
   lang,
+  profile,
 }: {
   mx: MotionValue<number>;
   my: MotionValue<number>;
   lang: "fr" | "en";
+  profile?: Profile | null;
 }) => {
   const px = useSpring(useTransform(mx, [0, 1], [8, -8]), SPRING);
   const py = useSpring(useTransform(my, [0, 1], [6, -6]), SPRING);
+
+  const photoSrc = profile?.photo || "/jean-duthil-photo.jpg";
+  const name = profile?.name || "Jean Duthil";
+  const linkedIn = profile?.socials?.find((s) => s.platform === "linkedin")?.url;
 
   return (
     <>
       <div className="relative aspect-[4/5] lg:aspect-auto lg:flex-1 rounded-xl overflow-hidden bg-muted">
         <motion.img
-          src="/jean-duthil-photo.jpg"
-          alt="Jean Duthil"
+          src={photoSrc}
+          alt={name}
           loading="lazy"
           className="w-full h-full object-cover object-top will-change-transform"
           style={{ x: px, y: py, scale: 1.06 }}
         />
-        {/* Gradient vignette */}
         <div
           aria-hidden
           className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/55 to-transparent pointer-events-none"
         />
-        {/* Availability badge */}
         <div className="absolute top-3 left-3 inline-flex items-center gap-1.5 rounded-full bg-background/95 backdrop-blur-sm border border-border px-2.5 py-1 text-[10px] font-medium text-foreground shadow-sm">
           <span className="relative flex h-1.5 w-1.5">
             <span className="animate-pulse_dot absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
@@ -218,7 +239,6 @@ const PhotoCard = ({
           </span>
           {lang === "fr" ? "Dispo sept. 2026" : "Available Sept 2026"}
         </div>
-        {/* Location pill */}
         <div className="absolute left-3 bottom-3 inline-flex items-center gap-1.5 rounded-full bg-background/95 backdrop-blur-sm border border-border px-2.5 py-1 text-[10px] font-medium text-foreground">
           <MapPin size={11} strokeWidth={2} />
           Bordeaux, FR
@@ -226,48 +246,49 @@ const PhotoCard = ({
       </div>
       <div className="mt-3 px-2 pb-1 flex items-end justify-between">
         <div>
-          <div className="text-sm font-semibold text-foreground">Jean Duthil</div>
+          <div className="text-sm font-semibold text-foreground">{name}</div>
           <div className="text-[11px] text-muted-foreground mt-0.5">
             {lang === "fr" ? "ESSCA · Promo 2028" : "ESSCA · Class of 2028"}
           </div>
         </div>
-        <a
-          href="https://linkedin.com/in/duthiljean"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground transition-colors group/link"
-          aria-label="LinkedIn"
-        >
-          LinkedIn
-          <ArrowUpRight
-            size={12}
-            className="transition-transform group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5"
-          />
-        </a>
+        {linkedIn && (
+          <a
+            href={linkedIn}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground transition-colors group/link"
+            aria-label="LinkedIn"
+          >
+            LinkedIn
+            <ArrowUpRight
+              size={12}
+              className="transition-transform group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5"
+            />
+          </a>
+        )}
       </div>
     </>
   );
 };
 
-/* ─────────────── Tiltable card components ─────────────── */
 const StatCard = ({
   stat,
   index,
   isInView,
+  lang,
 }: {
-  stat: {
-    value: number;
-    suffix: string;
-    label: string;
-    kicker: string;
-    icon: typeof Target;
-    trend: number[];
-  };
+  stat: AboutStat;
   index: number;
   isInView: boolean;
+  lang: "fr" | "en";
 }) => {
   const { ref, bindings, style } = useTilt(3);
-  const Icon = stat.icon;
+  const Icon = STAT_ICONS[index] ?? Target;
+  const { value, suffix } = parseStatValue(stat.value);
+  const trend = STAT_TRENDS[index] ?? STAT_TRENDS[0];
+  const kicker = pickLocale(stat.trend, lang) || (lang === "fr" ? "Stat" : "Stat");
+  const label = pickLocale(stat.label, lang);
+
   return (
     <motion.div
       ref={ref}
@@ -282,10 +303,8 @@ const StatCard = ({
         aria-hidden
         className="absolute inset-0 dot-grid-bg opacity-40 pointer-events-none"
         style={{
-          maskImage:
-            "radial-gradient(ellipse at top right, #000 0%, transparent 70%)",
-          WebkitMaskImage:
-            "radial-gradient(ellipse at top right, #000 0%, transparent 70%)",
+          maskImage: "radial-gradient(ellipse at top right, #000 0%, transparent 70%)",
+          WebkitMaskImage: "radial-gradient(ellipse at top right, #000 0%, transparent 70%)",
         }}
       />
       <div className="relative">
@@ -296,16 +315,16 @@ const StatCard = ({
               strokeWidth={2}
               className="transition-transform duration-300 group-hover:-rotate-12 group-hover:scale-110"
             />
-            {stat.kicker}
+            {kicker}
           </div>
         </div>
         <div className="mt-6 md:mt-7">
-          <Counter target={stat.value} suffix={stat.suffix} isInView={isInView} />
+          <Counter target={value} suffix={suffix} isInView={isInView} />
         </div>
-        <p className="mt-2 text-sm text-muted-foreground">{stat.label}</p>
+        <p className="mt-2 text-sm text-muted-foreground">{label}</p>
         <div className="mt-5 text-foreground/60 group-hover:text-foreground/90 transition-colors duration-300">
           <Sparkline
-            points={stat.trend}
+            points={trend}
             isInView={isInView}
             delay={0.35 + index * 0.1}
             gradId={`spark-${index}`}
@@ -319,9 +338,11 @@ const StatCard = ({
 const PhotoCardWrapper = ({
   isInView,
   lang,
+  profile,
 }: {
   isInView: boolean;
   lang: "fr" | "en";
+  profile?: Profile | null;
 }) => {
   const { ref, bindings, style, mx, my } = useTilt(2.5);
   return (
@@ -334,25 +355,28 @@ const PhotoCardWrapper = ({
       style={style}
       className="saas-card saas-card-hover card-spotlight group p-3 lg:row-span-2 flex flex-col"
     >
-      <PhotoCard mx={mx} my={my} lang={lang} />
+      <PhotoCard mx={mx} my={my} lang={lang} profile={profile} />
     </motion.div>
   );
 };
 
 const NowCard = ({
   isInView,
-  t,
+  about,
   lang,
 }: {
   isInView: boolean;
-  t: (key: string) => string;
+  about?: AboutDoc | null;
   lang: "fr" | "en";
 }) => {
   const { ref, bindings, style } = useTilt(2);
-  const items = [
-    { title: t("about.now_1_title"), desc: t("about.now_1_desc"), active: true },
-    { title: t("about.now_2_title"), desc: t("about.now_2_desc"), active: false },
-  ];
+  const items = (about?.nowItems ?? []).map((item, i) => ({
+    title: item.title,
+    desc: pickLocale(item.description, lang),
+    active: i === 0,
+  }));
+  const nowLabel = pickLocale(about?.nowLabel, lang);
+
   return (
     <motion.div
       ref={ref}
@@ -370,7 +394,7 @@ const NowCard = ({
             strokeWidth={2}
             className="transition-transform duration-500 group-hover:rotate-[20deg] group-hover:scale-110"
           />
-          {t("about.now_label")}
+          {nowLabel}
         </div>
         <span className="relative flex h-1.5 w-1.5">
           <span className="animate-pulse_dot absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
@@ -413,36 +437,46 @@ const NowCard = ({
   );
 };
 
-/* ─────────────── About ─────────────── */
 const About = () => {
-  const { t, lang } = useLanguage();
+  const { lang } = useLanguage();
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, amount: 0.15, margin: "0px 0px -40px 0px" });
 
-  const stats = [
-    {
-      value: 400,
-      suffix: "+",
-      label: t("about.stat1"),
-      kicker: lang === "fr" ? "Prospection" : "Outreach",
-      icon: Target,
-      trend: [8, 20, 45, 90, 145, 210, 260, 315, 360, 400],
-    },
-    {
-      value: 30,
-      suffix: "",
-      label: t("about.stat2"),
-      kicker: lang === "fr" ? "Conversion" : "Conversion",
-      icon: Zap,
-      trend: [0, 1, 3, 6, 9, 13, 18, 22, 27, 30],
-    },
-  ];
+  const { data: about } = useQuery<AboutDoc | null>({
+    queryKey: ["about"],
+    queryFn: fetchAbout,
+  });
+  const { data: profile } = useQuery<Profile | null>({
+    queryKey: ["profile"],
+    queryFn: fetchProfile,
+  });
+
+  const kicker = pickLocale(about?.kicker, lang);
+  const headlines = (about?.headlines ?? []).map((h) => pickLocale(h, lang));
+  const bio = pickLocale(about?.bio, lang);
+  const stats = about?.stats ?? [];
 
   const facts = [
-    { icon: MapPin, label: lang === "fr" ? "Localisation" : "Location", value: t("about.location") },
-    { icon: Calendar, label: lang === "fr" ? "Disponibilité" : "Availability", value: "Sept. 2026" },
-    { icon: Repeat, label: lang === "fr" ? "Rythme" : "Rhythm", value: t("about.rhythm") },
-    { icon: Globe, label: lang === "fr" ? "Langues" : "Languages", value: t("about.languages") },
+    {
+      icon: MapPin,
+      label: lang === "fr" ? "Localisation" : "Location",
+      value: pickLocale(about?.location, lang),
+    },
+    {
+      icon: Calendar,
+      label: lang === "fr" ? "Disponibilité" : "Availability",
+      value: "Sept. 2026",
+    },
+    {
+      icon: Repeat,
+      label: lang === "fr" ? "Rythme" : "Rhythm",
+      value: pickLocale(about?.rhythm, lang),
+    },
+    {
+      icon: Globe,
+      label: lang === "fr" ? "Langues" : "Languages",
+      value: pickLocale(about?.languages, lang),
+    },
   ];
 
   return (
@@ -451,7 +485,6 @@ const About = () => {
       className="relative py-16 sm:py-20 md:py-28 px-5 md:px-8 section-alt-bg border-t border-border"
     >
       <div className="container mx-auto max-w-5xl" ref={ref}>
-        {/* Section header */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -459,31 +492,41 @@ const About = () => {
           transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
           className="max-w-2xl"
         >
-          <div className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-2.5 py-1 text-[11px] font-medium text-muted-foreground mb-5">
-            <span className="h-1 w-1 rounded-full bg-foreground/60" />
-            {t("about.kicker")}
-          </div>
-          <h2 className="text-3xl md:text-5xl font-semibold tracking-[-0.035em] leading-[1.05] text-foreground">
-            {t("about.headline1")} {t("about.headline2")}
-            <span className="text-muted-foreground"> — {t("about.headline3")}</span>
-          </h2>
-          <p
-            className="mt-5 text-base md:text-lg text-muted-foreground leading-relaxed"
-            style={{ textWrap: "pretty" } as React.CSSProperties}
-          >
-            {t("about.bio")}
-          </p>
+          {kicker && (
+            <div className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-2.5 py-1 text-[11px] font-medium text-muted-foreground mb-5">
+              <span className="h-1 w-1 rounded-full bg-foreground/60" />
+              {kicker}
+            </div>
+          )}
+          {headlines.length > 0 && (
+            <h2 className="text-3xl md:text-5xl font-semibold tracking-[-0.035em] leading-[1.05] text-foreground">
+              {headlines.slice(0, 2).join(" ")}
+              {headlines[2] && (
+                <span className="text-muted-foreground"> — {headlines[2]}</span>
+              )}
+            </h2>
+          )}
+          {bio && (
+            <p
+              className="mt-5 text-base md:text-lg text-muted-foreground leading-relaxed"
+              style={{ textWrap: "pretty" } as React.CSSProperties}
+            >
+              {bio}
+            </p>
+          )}
         </motion.div>
 
-        {/* Asymmetric bento */}
         <div className="mt-10 md:mt-12 grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <StatCard stat={stats[0]} index={0} isInView={isInView} />
-          <StatCard stat={stats[1]} index={1} isInView={isInView} />
-          <PhotoCardWrapper isInView={isInView} lang={lang as "fr" | "en"} />
-          <NowCard isInView={isInView} t={t} lang={lang as "fr" | "en"} />
+          {stats[0] && (
+            <StatCard stat={stats[0]} index={0} isInView={isInView} lang={lang as "fr" | "en"} />
+          )}
+          {stats[1] && (
+            <StatCard stat={stats[1]} index={1} isInView={isInView} lang={lang as "fr" | "en"} />
+          )}
+          <PhotoCardWrapper isInView={isInView} lang={lang as "fr" | "en"} profile={profile} />
+          <NowCard isInView={isInView} about={about} lang={lang as "fr" | "en"} />
         </div>
 
-        {/* Facts strip — unified card with internal dividers + per-cell spotlight */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           whileInView={{ opacity: 1, y: 0 }}
