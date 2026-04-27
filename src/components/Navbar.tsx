@@ -57,6 +57,15 @@ const Navbar = () => {
   }, [snapCursor]);
 
   useEffect(() => {
+    if (!mobileOpen) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setMobileOpen(false);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [mobileOpen]);
+
+  useEffect(() => {
     let ticking = false;
     const handleScroll = () => {
       if (ticking) return;
@@ -86,7 +95,7 @@ const Navbar = () => {
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-200 ${
         scrolled
-          ? "bg-background/80 backdrop-blur-md border-b border-border"
+          ? "bg-background/[0.82] backdrop-blur-xl border-b border-border shadow-[0_10px_35px_-30px_rgba(0,0,0,0.5)]"
           : "bg-transparent"
       }`}
     >
@@ -115,7 +124,7 @@ const Navbar = () => {
         <ul
           ref={navListRef}
           onMouseLeave={() => setHoveredSection(null)}
-          className="relative hidden md:flex items-center rounded-full border border-border bg-card p-1"
+          className="relative hidden md:flex items-center rounded-full border border-border bg-card/[0.82] p-1 shadow-sm backdrop-blur-md"
         >
           <motion.li
             aria-hidden
@@ -134,6 +143,7 @@ const Navbar = () => {
               >
                 <a
                   href={l.href}
+                  aria-current={activeSection === l.id ? "page" : undefined}
                   className={`block px-4 py-1.5 text-xs font-medium uppercase tracking-wide select-none transition-colors duration-200 ${
                     isLit ? "text-background" : "text-muted-foreground hover:text-foreground"
                   }`}
@@ -147,6 +157,7 @@ const Navbar = () => {
 
         <div className="hidden md:flex items-center gap-1">
           <button
+            type="button"
             onClick={(e) => {
               const r = e.currentTarget.getBoundingClientRect();
               toggleTheme({ x: r.left + r.width / 2, y: r.top + r.height / 2 });
@@ -170,6 +181,7 @@ const Navbar = () => {
           </button>
           <span aria-hidden className="h-4 w-px bg-border mx-0.5" />
           <button
+            type="button"
             onClick={() => setLang(lang === "fr" ? "en" : "fr")}
             className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-all"
             aria-label="Toggle language"
@@ -182,6 +194,7 @@ const Navbar = () => {
         {/* Mobile toggle */}
         <div className="flex md:hidden items-center gap-1">
           <button
+            type="button"
             onClick={(e) => {
               const r = e.currentTarget.getBoundingClientRect();
               toggleTheme({ x: r.left + r.width / 2, y: r.top + r.height / 2 });
@@ -203,6 +216,7 @@ const Navbar = () => {
             </AnimatePresence>
           </button>
           <button
+            type="button"
             onClick={() => setLang(lang === "fr" ? "en" : "fr")}
             className="inline-flex items-center gap-1 px-2 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors rounded-lg"
             aria-label="Toggle language"
@@ -211,9 +225,12 @@ const Navbar = () => {
             {lang === "fr" ? "EN" : "FR"}
           </button>
           <button
-            className="p-2 text-foreground"
+            type="button"
+            className="p-2 text-foreground rounded-lg hover:bg-muted transition-colors"
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label="Menu"
+            aria-expanded={mobileOpen}
+            aria-controls="mobile-navigation"
           >
             {mobileOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
@@ -238,6 +255,7 @@ const Navbar = () => {
 
             {/* Panel */}
             <motion.ul
+              id="mobile-navigation"
               initial={{ opacity: 0, y: -6, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -6, scale: 0.98 }}
@@ -250,6 +268,7 @@ const Navbar = () => {
                   <li key={l.href}>
                     <a
                       href={l.href}
+                      aria-current={isActive ? "page" : undefined}
                       onClick={() => setMobileOpen(false)}
                       className={`block rounded-full px-4 py-2.5 text-xs font-medium uppercase tracking-wide transition-colors ${
                         isActive

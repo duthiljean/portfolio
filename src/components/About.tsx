@@ -28,6 +28,7 @@ import {
   type AboutStat,
   type Profile,
 } from "@/lib/sanity";
+import { fallbackAbout, fallbackProfile } from "@/lib/fallback-content";
 
 const STAT_ICONS = [Target, Zap];
 const STAT_TRENDS = [
@@ -442,15 +443,17 @@ const About = () => {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, amount: 0.15, margin: "0px 0px -40px 0px" });
 
-  const { data: about } = useQuery<AboutDoc | null>({
+  const { data: aboutData } = useQuery<AboutDoc | null>({
     queryKey: ["about"],
     queryFn: fetchAbout,
   });
-  const { data: profile } = useQuery<Profile | null>({
+  const { data: profileData } = useQuery<Profile | null>({
     queryKey: ["profile"],
     queryFn: fetchProfile,
   });
 
+  const about = aboutData ?? fallbackAbout;
+  const profile = profileData ?? fallbackProfile;
   const kicker = pickLocale(about?.kicker, lang);
   const headlines = (about?.headlines ?? []).map((h) => pickLocale(h, lang));
   const bio = pickLocale(about?.bio, lang);

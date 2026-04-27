@@ -169,7 +169,7 @@ const ParticleField = () => {
 
         let x = arr[ix];
         let y = arr[ix + 1];
-        let z = arr[ix + 2];
+        const z = arr[ix + 2];
 
         if (mouseActive) {
           const dx = x - mouseWorld.x;

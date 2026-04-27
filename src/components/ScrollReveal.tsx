@@ -1,5 +1,11 @@
 import { useRef } from "react";
-import { motion, useInView, useScroll, useTransform } from "framer-motion";
+import {
+  motion,
+  useInView,
+  useScroll,
+  useTransform,
+  type TargetAndTransition,
+} from "framer-motion";
 
 type AnimationType = "fade-up" | "fade-left" | "fade-right" | "scale" | "rotate" | "blur";
 
@@ -10,7 +16,10 @@ interface ScrollRevealProps {
   type?: AnimationType;
 }
 
-const variants: Record<AnimationType, { initial: any; animate: any }> = {
+const variants: Record<
+  AnimationType,
+  { initial: TargetAndTransition; animate: TargetAndTransition }
+> = {
   "fade-up": {
     initial: { opacity: 0, y: 30 },
     animate: { opacity: 1, y: 0 },
