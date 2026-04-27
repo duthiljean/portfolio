@@ -96,7 +96,7 @@ const useParisClock = () => {
 };
 
 /* ─────────── Primary Email Card ─────────── */
-const EmailHero = ({ mailto }: { mailto: string }) => {
+const EmailHero = ({ mailto, lang }: { mailto: string; lang: "fr" | "en" }) => {
   const { ref: spotRef, onPointerMove: onSpotMove } = useSpotlight<HTMLDivElement>();
   const { ref: tiltRef, rx, ry, onPointerMove: onTiltMove, onPointerLeave } = useTilt(2.5);
   const [copied, setCopied] = useState(false);
@@ -153,11 +153,11 @@ const EmailHero = ({ mailto }: { mailto: string }) => {
           <div className="flex items-center gap-2">
             <div className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
               <Mail size={11} />
-              Écris-moi
+              {lang === "fr" ? "Écris-moi" : "Email me"}
             </div>
             <div className="inline-flex items-center gap-1 rounded-full border border-foreground/20 bg-foreground/[0.04] px-2 py-0.5 text-[10px] font-medium text-foreground">
               <Sparkle size={10} strokeWidth={2.2} className="fill-foreground" />
-              Canal préféré
+              {lang === "fr" ? "Canal préféré" : "Preferred"}
             </div>
           </div>
 
@@ -200,7 +200,9 @@ const EmailHero = ({ mailto }: { mailto: string }) => {
           </button>
 
           <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
-            Le chemin le plus court pour un échange. Réponse sous 24h ouvrées.
+            {lang === "fr"
+              ? "Le chemin le plus court pour un échange. Réponse sous 24h ouvrées."
+              : "The shortest path to a conversation. Response within one business day."}
           </p>
         </div>
 
@@ -214,7 +216,7 @@ const EmailHero = ({ mailto }: { mailto: string }) => {
             className="shimmer-border h-11 px-5 rounded-full bg-foreground text-background hover:bg-foreground/90 text-sm font-medium gap-2 shadow-sm"
           >
             <Mail size={15} />
-            Envoyer un email
+            {lang === "fr" ? "Envoyer un email" : "Send an email"}
           </Button>
           <Button
             size="lg"
@@ -233,7 +235,7 @@ const EmailHero = ({ mailto }: { mailto: string }) => {
                   className="flex items-center gap-2"
                 >
                   <Check size={15} strokeWidth={2.4} />
-                  Copié
+                  {lang === "fr" ? "Copié" : "Copied"}
                 </motion.span>
               ) : (
                 <motion.span
@@ -245,7 +247,7 @@ const EmailHero = ({ mailto }: { mailto: string }) => {
                   className="flex items-center gap-2"
                 >
                   <Copy size={15} />
-                  Copier l'adresse
+                  {lang === "fr" ? "Copier l'adresse" : "Copy address"}
                 </motion.span>
               )}
             </AnimatePresence>
@@ -257,14 +259,14 @@ const EmailHero = ({ mailto }: { mailto: string }) => {
 };
 
 /* ─────────── Status card (live time + details) ─────────── */
-const StatusCard = () => {
+const StatusCard = ({ lang }: { lang: "fr" | "en" }) => {
   const { ref, onPointerMove } = useSpotlight<HTMLDivElement>();
   const time = useParisClock();
 
   const rows = [
-    { icon: MapPin, label: "Localisation", value: "Bordeaux, FR" },
-    { icon: Calendar, label: "Disponibilité", value: "Sept. 2026" },
-    { icon: Clock, label: "Heure locale", value: `${time} CET`, live: true },
+    { icon: MapPin, label: lang === "fr" ? "Localisation" : "Location", value: "Bordeaux, FR" },
+    { icon: Calendar, label: lang === "fr" ? "Disponibilité" : "Availability", value: "Sept. 2026" },
+    { icon: Clock, label: lang === "fr" ? "Heure locale" : "Local time", value: `${time} CET`, live: true },
   ];
 
   return (
@@ -279,14 +281,14 @@ const StatusCard = () => {
     >
       <div className="flex items-center justify-between">
         <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-          Statut
+          {lang === "fr" ? "Statut" : "Status"}
         </div>
         <div className="inline-flex items-center gap-1.5 text-[10px] font-medium text-foreground">
           <span className="relative flex h-1.5 w-1.5">
             <span className="animate-pulse_dot absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
             <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
           </span>
-          En recherche
+          {lang === "fr" ? "En recherche" : "Open"}
         </div>
       </div>
 
@@ -320,7 +322,10 @@ const StatusCard = () => {
       </ul>
 
       <div className="mt-5 pt-4 border-t border-border text-[11px] text-muted-foreground leading-relaxed">
-        Rythme alternance : <span className="text-foreground font-medium">2 sem. entreprise · 1 sem. école</span>
+        {lang === "fr" ? "Rythme alternance" : "Internship rhythm"}:{" "}
+        <span className="text-foreground font-medium">
+          {lang === "fr" ? "2 sem. entreprise · 1 sem. école" : "2 weeks company · 1 week school"}
+        </span>
       </div>
     </motion.div>
   );
@@ -361,11 +366,13 @@ const CvTile = ({
   disabled,
   loading,
   delay,
+  lang,
 }: {
   onClick: () => void;
   disabled?: boolean;
   loading?: boolean;
   delay: number;
+  lang: "fr" | "en";
 }) => {
   const { ref, onPointerMove } = useSpotlight<HTMLDivElement>();
 
@@ -402,7 +409,9 @@ const CvTile = ({
           </motion.div>
           <div className="min-w-0">
             <div className="text-sm font-semibold text-foreground truncate">
-              {loading ? "Génération…" : "Télécharger le CV"}
+              {loading
+                ? lang === "fr" ? "Génération…" : "Generating..."
+                : lang === "fr" ? "Télécharger le CV" : "Download resume"}
             </div>
             <div className="text-xs text-muted-foreground truncate tabular-nums">
               PDF · ~120 Ko
@@ -536,8 +545,14 @@ const Contact = () => {
   };
 
   const mailto = (() => {
-    const subject = "Opportunité d'alternance — Septembre 2026";
-    const body = `Salut Jean,\n\nJe te contacte concernant une opportunité d'alternance chez [ENTREPRISE] à partir de septembre 2026.\n\nPoste : [INTITULÉ]\nRythme : 2 semaines entreprise / 1 semaine école\nLieu : [LOCALISATION]\n\nQuelques mots sur le contexte :\n[...]\n\nTu serais dispo pour un échange cette semaine ?\n\nÀ bientôt,\n[NOM]`;
+    const subject =
+      lang === "fr"
+        ? "Opportunité d'alternance — Septembre 2026"
+        : "Internship opportunity — September 2026";
+    const body =
+      lang === "fr"
+        ? `Salut Jean,\n\nJe te contacte concernant une opportunité d'alternance chez [ENTREPRISE] à partir de septembre 2026.\n\nPoste : [INTITULÉ]\nRythme : 2 semaines entreprise / 1 semaine école\nLieu : [LOCALISATION]\n\nQuelques mots sur le contexte :\n[...]\n\nTu serais dispo pour un échange cette semaine ?\n\nÀ bientôt,\n[NOM]`
+        : `Hi Jean,\n\nI'm reaching out about an internship opportunity at [COMPANY] starting in September 2026.\n\nRole: [TITLE]\nRhythm: 2 weeks in company / 1 week at school\nLocation: [LOCATION]\n\nA few words about the context:\n[...]\n\nWould you be available for a quick call this week?\n\nBest,\n[NAME]`;
     return `mailto:${EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   })();
 
@@ -561,16 +576,18 @@ const Contact = () => {
                 <span className="animate-pulse_dot absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                 <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
               </span>
-              Dispo dès sept. 2026
+              {lang === "fr" ? "Dispo dès sept. 2026" : "Available Sept. 2026"}
             </div>
             <h2 className="text-3xl md:text-5xl font-semibold tracking-[-0.035em] leading-[1.05] text-foreground">
-              On travaille ensemble ?
+              {lang === "fr" ? "On travaille ensemble ?" : "Shall we work together?"}
             </h2>
             <p
               className="mt-4 text-base md:text-lg text-muted-foreground leading-relaxed"
               style={{ textWrap: "balance" } as React.CSSProperties}
             >
-              Alternance Business Dev, Product ou IA appliquée — 2 semaines entreprise / 1 semaine école. Toujours partant pour un café ou un appel.
+              {lang === "fr"
+                ? "Alternance Business Dev, Product ou IA appliquée — 2 semaines entreprise / 1 semaine école. Toujours partant pour un café ou un appel."
+                : "Business Dev, Product or Applied AI internship — 2 weeks in company / 1 week at school. Always open to coffee or a call."}
             </p>
           </div>
           <div className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
@@ -579,14 +596,14 @@ const Contact = () => {
               <Clock size={11} strokeWidth={2.2} />
               &lt; 24h
             </span>
-            <span>· réponse</span>
+            <span>{lang === "fr" ? "· réponse" : "· response"}</span>
           </div>
         </motion.div>
 
         {/* Bento */}
         <div className="mt-10 md:mt-12 grid grid-cols-1 lg:grid-cols-5 gap-4">
-          <EmailHero mailto={mailto} />
-          <StatusCard />
+          <EmailHero mailto={mailto} lang={lang as "fr" | "en"} />
+          <StatusCard lang={lang as "fr" | "en"} />
 
           <ActionTile
             icon={Linkedin}
@@ -599,7 +616,7 @@ const Contact = () => {
           />
           <ActionTile
             icon={Phone}
-            title="Téléphone"
+            title={lang === "fr" ? "Téléphone" : "Phone"}
             sub="07 60 04 90 11"
             delay={0.3}
             href="tel:+33760049011"
@@ -610,6 +627,7 @@ const Contact = () => {
             disabled={generating}
             loading={generating}
             delay={0.36}
+            lang={lang as "fr" | "en"}
           />
         </div>
       </div>

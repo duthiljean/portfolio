@@ -21,6 +21,7 @@ import {
   type Certification,
   type Degree,
 } from "@/lib/sanity";
+import { fallbackEducation } from "@/lib/fallback-content";
 
 const FALLBACK_LOGOS: Record<string, string> = {
   anthropic: anthropicLogo,
@@ -404,7 +405,7 @@ const CertCard = ({
                     src={cert.certImage || moocCert}
                     alt="Certificate"
                     loading="lazy"
-                    className="w-full block transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:scale-[1.02]"
+                    className="w-full block transition-transform duration-500 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] hover:scale-[1.02]"
                   />
                 </motion.div>
               )}
@@ -420,13 +421,12 @@ const Education = () => {
   const { lang } = useLanguage();
   const [openCert, setOpenCert] = useState<string | null>(null);
 
-  const { data: education } = useQuery<EducationDoc | null>({
+  const { data: educationData } = useQuery<EducationDoc | null>({
     queryKey: ["education"],
     queryFn: fetchEducation,
   });
 
-  if (!education) return null;
-
+  const education = educationData ?? fallbackEducation;
   const title = pickLocale(education.title, lang);
   const dateline = pickLocale(education.dateline, lang);
   const certsLabel = pickLocale(education.certsLabel, lang);

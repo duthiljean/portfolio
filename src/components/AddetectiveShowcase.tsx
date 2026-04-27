@@ -9,6 +9,7 @@ import {
 import { ArrowUpRight, Lock } from "lucide-react";
 import addetectiveScreenshot from "@/assets/addetective-screenshot.webp";
 import addetectiveLogo from "@/assets/addetective-logo.svg";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 /* ─────────── Browser chrome frame ─────────── */
 const BrowserFrame = ({ children }: { children: React.ReactNode }) => (
@@ -98,6 +99,22 @@ const ShowcaseCard = ({
 
 /* ─────────── Main section ─────────── */
 const AddetectiveShowcase = () => {
+  const { lang } = useLanguage();
+  const metrics = [
+    {
+      label: lang === "fr" ? "Analyse" : "Analysis",
+      value: "30s",
+    },
+    {
+      label: lang === "fr" ? "Entrées" : "Inputs",
+      value: lang === "fr" ? "Texte + photos" : "Text + photos",
+    },
+    {
+      label: lang === "fr" ? "Sortie" : "Output",
+      value: lang === "fr" ? "Score + négo" : "Score + deal room",
+    },
+  ];
+
   return (
     <section
       id="addetective-showcase"
@@ -132,7 +149,7 @@ const AddetectiveShowcase = () => {
               <span className="animate-pulse_dot absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
               <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
             </span>
-            PROJET VEDETTE · EN PRODUCTION
+            {lang === "fr" ? "PROJET VEDETTE · EN PRODUCTION" : "FEATURED PROJECT · LIVE"}
           </motion.div>
 
           <motion.div
@@ -160,7 +177,9 @@ const AddetectiveShowcase = () => {
             className="mt-4 max-w-xl mx-auto text-base md:text-lg text-muted-foreground leading-relaxed"
             style={{ textWrap: "balance" } as React.CSSProperties}
           >
-            L'IA qui analyse n'importe quelle annonce en 30 secondes — points de vigilance, incohérences et marge de négociation estimée.
+            {lang === "fr"
+              ? "L'IA qui analyse n'importe quelle annonce en 30 secondes — points de vigilance, incohérences et marge de négociation estimée."
+              : "AI that reviews any listing in 30 seconds — red flags, inconsistencies and estimated negotiation margin."}
           </motion.p>
         </div>
 
@@ -178,13 +197,35 @@ const AddetectiveShowcase = () => {
           </ContainerScroll>
         </div>
 
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.4, delay: 0.08 }}
+          className="mt-8 md:mt-10 grid grid-cols-1 sm:grid-cols-3 gap-px overflow-hidden rounded-2xl border border-border bg-border max-w-4xl mx-auto"
+        >
+          {metrics.map((metric) => (
+            <div
+              key={metric.label}
+              className="bg-card px-4 py-4 text-center sm:text-left"
+            >
+              <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                {metric.label}
+              </div>
+              <div className="mt-1 text-sm md:text-base font-semibold text-foreground">
+                {metric.value}
+              </div>
+            </div>
+          ))}
+        </motion.div>
+
         {/* Stack + CTA */}
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.4, delay: 0.1 }}
-          className="mt-10 md:mt-14 flex flex-wrap items-center justify-center gap-2"
+          className="mt-7 md:mt-8 flex flex-wrap items-center justify-center gap-2"
         >
           <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mr-1">
             Stack
@@ -203,7 +244,7 @@ const AddetectiveShowcase = () => {
             rel="noopener noreferrer"
             className="group inline-flex items-center gap-1.5 rounded-full bg-foreground px-3 py-1 text-xs font-medium text-background hover:bg-foreground/90 transition-colors ml-1"
           >
-            Voir le site
+            {lang === "fr" ? "Voir le site" : "Visit site"}
             <ArrowUpRight
               size={12}
               strokeWidth={2.2}

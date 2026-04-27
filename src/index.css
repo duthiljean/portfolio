@@ -8,6 +8,9 @@
   :root {
     --background: 0 0% 100%;
     --foreground: 0 0% 4%;
+    --brand-blue: 213 92% 52%;
+    --brand-teal: 166 72% 36%;
+    --brand-gold: 38 90% 52%;
 
     --card: 0 0% 100%;
     --card-foreground: 0 0% 4%;
@@ -52,6 +55,9 @@
   .dark {
     --background: 0 0% 6%;
     --foreground: 0 0% 96%;
+    --brand-blue: 214 96% 64%;
+    --brand-teal: 166 78% 44%;
+    --brand-gold: 40 92% 58%;
 
     --card: 0 0% 9%;
     --card-foreground: 0 0% 96%;
@@ -126,10 +132,19 @@
     @apply bg-background text-foreground font-sans antialiased;
     font-feature-settings: "cv11", "ss01", "ss03";
     letter-spacing: -0.011em;
+    background:
+      radial-gradient(circle at top left, hsl(var(--brand-blue) / 0.045), transparent 34rem),
+      radial-gradient(circle at 78% 18%, hsl(var(--brand-teal) / 0.055), transparent 28rem),
+      hsl(var(--background));
   }
 
   :focus-visible {
     @apply outline-2 outline-offset-2 outline-foreground rounded-md;
+  }
+
+  ::selection {
+    color: hsl(var(--background));
+    background: hsl(var(--foreground));
   }
 
   h1, h2, h3, h4 {
@@ -144,15 +159,29 @@
 
 @layer utilities {
   .section-alt-bg {
-    background-color: hsl(var(--section-alt));
+    background:
+      linear-gradient(180deg, hsl(var(--section-alt)), hsl(var(--section-alt) / 0.72)),
+      radial-gradient(circle at 14% 18%, hsl(var(--brand-teal) / 0.055), transparent 24rem);
   }
 
   .saas-card {
-    @apply relative bg-card border border-border rounded-2xl transition-all duration-200;
+    @apply relative bg-card/95 border border-border rounded-2xl transition-all duration-200;
   }
 
   .saas-card-hover {
-    @apply hover:border-foreground/20 hover:shadow-[0_4px_24px_-6px_rgba(0,0,0,0.08)];
+    @apply hover:border-foreground/20 hover:shadow-[0_18px_42px_-32px_rgba(0,0,0,0.45)];
+  }
+
+  .hero-atmosphere {
+    background:
+      radial-gradient(circle at 50% 18%, hsl(var(--brand-blue) / 0.08), transparent 26rem),
+      radial-gradient(circle at 85% 58%, hsl(var(--brand-teal) / 0.075), transparent 26rem),
+      linear-gradient(180deg, hsl(var(--background)), hsl(var(--section-alt) / 0.62));
+  }
+
+  .premium-divider {
+    background:
+      linear-gradient(90deg, transparent, hsl(var(--brand-blue) / 0.38), hsl(var(--brand-teal) / 0.36), transparent);
   }
 
   .dot-grid-bg {

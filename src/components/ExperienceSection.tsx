@@ -43,6 +43,22 @@ const imageFallback = localExperiences.reduce<Record<string, string | undefined>
   {},
 );
 
+const fallbackExperiences: SanityExperience[] = localExperiences.map((exp, index) => ({
+  _id: `fallback-${index}-${exp.company.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`,
+  title: exp.title,
+  company: exp.company,
+  type: exp.type,
+  dates: exp.dates,
+  location: exp.location,
+  description: exp.description,
+  badges: exp.badges.map((badge, badgeIndex) => ({
+    _key: `fallback-badge-${index}-${badgeIndex}`,
+    ...badge,
+  })),
+  siteUrl: exp.siteUrl,
+  order: index,
+}));
+
 const useSpotlight = () => {
   const ref = useRef<HTMLDivElement>(null);
   const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
@@ -261,7 +277,7 @@ const ExperienceCard = ({
                     src={imageUrl}
                     alt={exp.company}
                     loading="lazy"
-                    className="w-full block transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:scale-[1.02]"
+                    className="w-full block transition-transform duration-500 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] hover:scale-[1.02]"
                   />
                 </motion.div>
               )}
@@ -385,18 +401,23 @@ const FilterTabs = ({
 const ExperienceSection = () => {
   const { t, lang } = useLanguage();
   const [filter, setFilter] = useState<FilterId>("all");
-  const [experiences, setExperiences] = useState<SanityExperience[]>([]);
-  const [openId, setOpenId] = useState<string | null>(null);
+  const [experiences, setExperiences] = useState<SanityExperience[]>(fallbackExperiences);
+  const [openId, setOpenId] = useState<string | null>(fallbackExperiences[0]?._id ?? null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchExperiences()
       .then((data) => {
-        setExperiences(data);
-        if (data.length > 0) setOpenId(data[0]._id);
+        if (data.length > 0) {
+          setExperiences(data);
+          setOpenId(data[0]._id);
+        } else {
+          setOpenId(fallbackExperiences[0]?._id ?? null);
+        }
       })
       .catch((err) => {
         console.error("[Sanity] Failed to fetch experiences:", err);
+        setOpenId(fallbackExperiences[0]?._id ?? null);
       })
       .finally(() => setLoading(false));
   }, []);
@@ -449,10 +470,12 @@ const ExperienceSection = () => {
             {t("exp.title")}
           </div>
           <h2 className="text-3xl md:text-5xl font-semibold tracking-[-0.035em] leading-[1.05] text-foreground">
-            {t("exp.title")}
+            {lang === "fr" ? "Des expériences reliées par l'exécution." : "Experience tied together by execution."}
           </h2>
           <p className="mt-4 text-base text-muted-foreground leading-relaxed">
-            {experiences.length} {t("exp.entries_label")}
+            {lang === "fr"
+              ? `${experiences.length} expériences, du terrain opérationnel au SaaS IA en production.`
+              : `${experiences.length} entries, from field operations to an AI SaaS in production.`}
           </p>
         </motion.div>
 

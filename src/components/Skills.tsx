@@ -31,6 +31,7 @@ import {
   type SkillPill as SkillPillType,
   type SkillsSection,
 } from "@/lib/sanity";
+import { fallbackSkills } from "@/lib/fallback-content";
 
 const pillLogos: Record<string, string> = {
   Claude: claudeLogo,
@@ -350,13 +351,12 @@ const CategoryCard = ({
 
 const Skills = () => {
   const { lang } = useLanguage();
-  const { data: skills } = useQuery<SkillsSection | null>({
+  const { data: skillsData } = useQuery<SkillsSection | null>({
     queryKey: ["skills"],
     queryFn: fetchSkills,
   });
 
-  if (!skills) return null;
-
+  const skills = skillsData ?? fallbackSkills;
   const categories = skills.categories ?? [];
   const dailyStack = skills.dailyStack ?? [];
   const dailyToolNames = new Set(dailyStack.map((t) => t.name));

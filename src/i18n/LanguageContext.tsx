@@ -5,7 +5,7 @@ type Lang = "fr" | "en";
 const getInitialLang = (): Lang => {
   const stored = localStorage.getItem("portfolio-lang");
   if (stored === "fr" || stored === "en") return stored;
-  return navigator.language.startsWith("en") ? "en" : "fr";
+  return "fr";
 };
 
 interface LanguageContextType {
