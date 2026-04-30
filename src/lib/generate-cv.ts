@@ -186,9 +186,9 @@ const COPY = {
     sectionCerts: "Certifications",
     eduDegree: "Bachelor en Management International",
     eduSchool: "ESSCA School of Management",
-    eduDates: "2023 — 2026",
+    eduDates: "2024 — 2027",
     eduLocation: "Bordeaux, France",
-    eduBde: "VP du Bureau Des Étudiants · 2024—2026",
+    eduBde: "VP du Bureau Des Étudiants · 2025—2026",
     certs: [
       "Anthropic — Claude 101 · Claude Code in Action · Claude Cowork",
       "MOOC Creative Box — ESSCA (2025)",
@@ -221,9 +221,9 @@ const COPY = {
     sectionCerts: "Certifications",
     eduDegree: "Bachelor in International Management",
     eduSchool: "ESSCA School of Management",
-    eduDates: "2023 — 2026",
+    eduDates: "2024 — 2027",
     eduLocation: "Bordeaux, France",
-    eduBde: "VP of the Student Union · 2024—2026",
+    eduBde: "VP of the Student Union · 2025—2026",
     certs: [
       "Anthropic — Claude 101 · Claude Code in Action · Claude Cowork",
       "MOOC Creative Box — ESSCA (2025)",

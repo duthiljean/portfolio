@@ -221,17 +221,23 @@ const PhotoCard = ({
 
   return (
     <>
-      <div className="relative aspect-[4/5] lg:aspect-auto lg:flex-1 rounded-xl overflow-hidden bg-muted">
+      <div className="relative aspect-[4/5] lg:aspect-auto lg:flex-1 lg:min-h-[440px] rounded-xl overflow-hidden bg-muted">
         <motion.img
           src={photoSrc}
           alt={name}
-          loading="lazy"
+          loading="eager"
+          decoding="async"
           className="w-full h-full object-cover object-top will-change-transform"
-          style={{ x: px, y: py, scale: 1.06 }}
+          style={{
+            x: px,
+            y: py,
+            scale: 1.06,
+            backfaceVisibility: "hidden",
+          }}
         />
         <div
           aria-hidden
-          className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/55 to-transparent pointer-events-none"
+          className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black/70 via-black/25 to-transparent pointer-events-none"
         />
         <div className="absolute top-3 left-3 inline-flex items-center gap-1.5 rounded-full bg-background/95 backdrop-blur-sm border border-border px-2.5 py-1 text-[10px] font-medium text-foreground shadow-sm">
           <span className="relative flex h-1.5 w-1.5">
@@ -240,33 +246,40 @@ const PhotoCard = ({
           </span>
           {lang === "fr" ? "Dispo sept. 2026" : "Available Sept 2026"}
         </div>
-        <div className="absolute left-3 bottom-3 inline-flex items-center gap-1.5 rounded-full bg-background/95 backdrop-blur-sm border border-border px-2.5 py-1 text-[10px] font-medium text-foreground">
-          <MapPin size={11} strokeWidth={2} />
-          Bordeaux, FR
+        <div className="absolute left-3 right-3 bottom-3 flex items-end justify-between gap-2">
+          <div>
+            <div className="text-base font-semibold text-white leading-tight tracking-[-0.01em] drop-shadow-sm">
+              {name}
+            </div>
+            <div className="mt-1 inline-flex items-center gap-1 text-[11px] font-medium text-white/85">
+              <MapPin size={10} strokeWidth={2.2} />
+              Bordeaux, FR
+            </div>
+          </div>
+          {linkedIn && (
+            <a
+              href={linkedIn}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 rounded-full bg-white/15 hover:bg-white/25 backdrop-blur-md border border-white/20 px-2.5 py-1 text-[11px] font-medium text-white transition-colors group/link"
+              aria-label="LinkedIn"
+            >
+              LinkedIn
+              <ArrowUpRight
+                size={12}
+                className="transition-transform group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5"
+              />
+            </a>
+          )}
         </div>
       </div>
-      <div className="mt-3 px-2 pb-1 flex items-end justify-between">
-        <div>
-          <div className="text-sm font-semibold text-foreground">{name}</div>
-          <div className="text-[11px] text-muted-foreground mt-0.5">
-            {lang === "fr" ? "ESSCA · Promo 2028" : "ESSCA · Class of 2028"}
-          </div>
+      <div className="mt-3 px-2 pb-1 flex items-center justify-between">
+        <div className="text-[11px] text-muted-foreground">
+          {lang === "fr" ? "ESSCA · Promo 2027" : "ESSCA · Class of 2027"}
         </div>
-        {linkedIn && (
-          <a
-            href={linkedIn}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground transition-colors group/link"
-            aria-label="LinkedIn"
-          >
-            LinkedIn
-            <ArrowUpRight
-              size={12}
-              className="transition-transform group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5"
-            />
-          </a>
-        )}
+        <div className="text-[11px] text-muted-foreground tabular-nums">
+          {lang === "fr" ? "20 ans" : "20 yrs"}
+        </div>
       </div>
     </>
   );
@@ -345,15 +358,34 @@ const PhotoCardWrapper = ({
   lang: "fr" | "en";
   profile?: Profile | null;
 }) => {
-  const { ref, bindings, style, mx, my } = useTilt(2.5);
+  const ref = useRef<HTMLDivElement>(null);
+  const mx = useMotionValue(0.5);
+  const my = useMotionValue(0.5);
+
+  const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (e.pointerType === "touch" || !ref.current) return;
+    const rect = ref.current.getBoundingClientRect();
+    const px = (e.clientX - rect.left) / rect.width;
+    const py = (e.clientY - rect.top) / rect.height;
+    mx.set(px);
+    my.set(py);
+    ref.current.style.setProperty("--mx", `${px * 100}%`);
+    ref.current.style.setProperty("--my", `${py * 100}%`);
+  };
+
+  const onPointerLeave = () => {
+    mx.set(0.5);
+    my.set(0.5);
+  };
+
   return (
     <motion.div
       ref={ref}
-      {...bindings}
+      onPointerMove={onPointerMove}
+      onPointerLeave={onPointerLeave}
       initial={{ opacity: 0, y: 16 }}
       animate={isInView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.5, delay: 0.26, ease: [0.16, 1, 0.3, 1] }}
-      style={style}
       className="saas-card saas-card-hover card-spotlight group p-3 lg:row-span-2 flex flex-col"
     >
       <PhotoCard mx={mx} my={my} lang={lang} profile={profile} />
@@ -371,9 +403,13 @@ const NowCard = ({
   lang: "fr" | "en";
 }) => {
   const { ref, bindings, style } = useTilt(2);
+  const NOW_HINTS_FR = ["depuis avr.", "depuis 2024"];
+  const NOW_HINTS_EN = ["since Apr", "since 2024"];
+  const hints = lang === "fr" ? NOW_HINTS_FR : NOW_HINTS_EN;
   const items = (about?.nowItems ?? []).map((item, i) => ({
     title: item.title,
     desc: pickLocale(item.description, lang),
+    hint: hints[i],
     active: i === 0,
   }));
   const nowLabel = pickLocale(about?.nowLabel, lang);
@@ -422,11 +458,9 @@ const NowCard = ({
               <div className="text-sm font-semibold text-foreground leading-snug">
                 {item.title}
               </div>
-              {item.active && (
-                <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground shrink-0">
-                  {lang === "fr" ? "En cours" : "Ongoing"}
-                </span>
-              )}
+              <span className="text-[10px] font-medium tabular-nums tracking-wide text-muted-foreground shrink-0">
+                {item.hint}
+              </span>
             </div>
             <div className="text-xs text-muted-foreground mt-1 leading-relaxed">
               {item.desc}
@@ -502,16 +536,25 @@ const About = () => {
             </div>
           )}
           {headlines.length > 0 && (
-            <h2 className="text-3xl md:text-5xl font-semibold tracking-[-0.035em] leading-[1.05] text-foreground">
-              {headlines.slice(0, 2).join(" ")}
+            <h2 className="text-[2rem] sm:text-4xl md:text-[3.25rem] font-semibold tracking-[-0.04em] leading-[1.02] text-foreground">
+              {headlines[0]}
+              {headlines[1] && (
+                <>
+                  <br />
+                  {headlines[1]}
+                </>
+              )}
               {headlines[2] && (
-                <span className="text-muted-foreground"> — {headlines[2]}</span>
+                <>
+                  <br />
+                  <span className="text-muted-foreground">{headlines[2]}</span>
+                </>
               )}
             </h2>
           )}
           {bio && (
             <p
-              className="mt-5 text-base md:text-lg text-muted-foreground leading-relaxed"
+              className="mt-6 text-base md:text-lg text-foreground/75 leading-relaxed max-w-xl"
               style={{ textWrap: "pretty" } as React.CSSProperties}
             >
               {bio}
@@ -538,23 +581,31 @@ const About = () => {
           className="mt-3 md:mt-4 saas-card overflow-hidden"
         >
           <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-border">
-            {facts.map(({ icon: Icon, label, value }) => (
-              <div
+            {facts.map(({ icon: Icon, label, value }, i) => (
+              <motion.div
                 key={label}
+                initial={{ opacity: 0, y: 8 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: 0.28 + i * 0.05, ease: [0.16, 1, 0.3, 1] }}
                 className="group relative bg-card p-4 md:p-5 transition-colors duration-300 hover:bg-muted/40"
               >
+                <span
+                  aria-hidden
+                  className="absolute left-0 top-4 bottom-4 w-px bg-foreground/0 group-hover:bg-foreground transition-colors duration-300"
+                />
                 <div className="flex items-center gap-1.5 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
                   <Icon
                     size={11}
                     strokeWidth={2}
-                    className="transition-transform duration-300 group-hover:scale-110 group-hover:text-foreground"
+                    className="transition-all duration-300 group-hover:scale-110 group-hover:text-foreground"
                   />
                   {label}
                 </div>
-                <div className="mt-2 text-sm md:text-base font-semibold text-foreground leading-tight">
+                <div className="mt-2 text-sm md:text-[0.95rem] font-semibold text-foreground leading-tight tracking-[-0.01em]">
                   {value}
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
         </motion.div>

@@ -528,14 +528,18 @@ const Contact = () => {
     if (generating) return;
     setGenerating(true);
     try {
-      const { generateCV } = await import("@/lib/generate-cv");
-      await generateCV(lang);
+      const link = document.createElement("a");
+      link.href = "/documents/cv-jean-duthil.pdf";
+      link.download = "CV-Jean-Duthil.pdf";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
       track("cv_downloaded", { lang });
       toast.success("CV téléchargé", {
         description: "Vérifie ton dossier Téléchargements.",
       });
     } catch (err) {
-      console.error("CV generation failed:", err);
+      console.error("CV download failed:", err);
       toast.error("Échec du téléchargement", {
         description: "Réessaie dans un instant.",
       });

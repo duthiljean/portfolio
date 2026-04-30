@@ -100,6 +100,10 @@ const SkillPill = ({
   isDaily: boolean;
   delay: number;
 }) => {
+  const variantClass = isDaily
+    ? "border-foreground/15 bg-foreground/[0.04] text-foreground hover:bg-foreground/[0.07] hover:border-foreground/25"
+    : "border-border bg-card text-foreground/80 hover:text-foreground hover:border-foreground/30 hover:bg-secondary/60";
+
   return (
     <Tooltip>
       <TooltipTrigger asChild>
@@ -109,7 +113,7 @@ const SkillPill = ({
           viewport={{ once: true, amount: 0.3, margin: "0px 0px -40px 0px" }}
           transition={{ delay, duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
           whileHover={{ y: -1 }}
-          className="group/pill inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border border-border bg-card text-foreground hover:border-foreground/40 hover:bg-secondary/60 transition-colors cursor-default select-none"
+          className={`group/pill inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border transition-all cursor-default select-none ${variantClass}`}
         >
           {p.name === "GitHub" ? (
             <svg
@@ -128,12 +132,6 @@ const SkillPill = ({
             />
           ) : null}
           {p.name}
-          {isDaily && (
-            <span className="relative flex h-1.5 w-1.5 shrink-0">
-              <span className="animate-pulse_dot absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
-            </span>
-          )}
         </motion.span>
       </TooltipTrigger>
       {tooltip && (
@@ -200,6 +198,8 @@ const DailyStackCard = ({
                   <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
                 </span>
                 {lang === "fr" ? "EN DIRECT" : "LIVE"}
+                <span className="text-foreground/40">·</span>
+                <span className="tabular-nums text-foreground">{tools.length}</span>
               </div>
               <div className="mt-1 text-[15px] font-semibold tracking-tight text-foreground">
                 {lang === "fr" ? "Stack quotidien" : "Daily stack"}
@@ -228,7 +228,7 @@ const DailyStackCard = ({
                         ease: [0.16, 1, 0.3, 1],
                       }}
                       whileHover={{ y: -2 }}
-                      className="group/tool relative flex items-center gap-2 rounded-lg border border-border bg-card px-2.5 py-2 hover:border-foreground/30 hover:bg-secondary/60 transition-colors cursor-default"
+                      className="group/tool relative flex items-center gap-2.5 rounded-lg border border-border bg-card px-3 py-2.5 hover:border-foreground/30 hover:bg-secondary/60 transition-colors cursor-default"
                     >
                       {logo && (
                         <img
@@ -239,18 +239,13 @@ const DailyStackCard = ({
                         />
                       )}
                       <div className="min-w-0 flex-1">
-                        <div className="text-[12px] font-medium text-foreground truncate">
+                        <div className="text-[12px] font-semibold text-foreground truncate leading-tight">
                           {tool.name}
                         </div>
-                        <div className="text-[10px] text-muted-foreground truncate leading-tight">
+                        <div className="text-[10px] text-muted-foreground truncate leading-tight mt-0.5">
                           {pickLocale(tool.use, lang)}
                         </div>
                       </div>
-                      <BadgeCheck
-                        size={12}
-                        className="text-foreground/70 shrink-0"
-                        strokeWidth={2.2}
-                      />
                     </motion.div>
                   </TooltipTrigger>
                   <TooltipContent side="top" className="text-xs">
@@ -313,13 +308,10 @@ const CategoryCard = ({
             </div>
           )}
         </div>
-        <div className="inline-flex items-center gap-1 rounded-full border border-border bg-card px-2 py-0.5 text-[10px] font-medium text-muted-foreground tabular-nums">
-          <span className="text-foreground">{pills.length}</span>
-          {dailyCount > 0 && (
-            <span className="ml-0.5 inline-flex items-center gap-0.5 text-emerald-600">
-              · <span className="relative flex h-1 w-1"><span className="relative inline-flex h-1 w-1 rounded-full bg-emerald-500" /></span>{dailyCount}
-            </span>
-          )}
+        <div className="text-[10px] font-medium tabular-nums text-muted-foreground">
+          <span className="text-foreground font-semibold">{pills.length}</span>
+          <span className="mx-0.5">/</span>
+          <span>{lang === "fr" ? "outils" : "tools"}</span>
         </div>
       </div>
 
@@ -345,6 +337,25 @@ const CategoryCard = ({
           />
         ))}
       </div>
+
+      {dailyCount > 0 && (
+        <div className="mt-5 pt-4 border-t border-border/60 flex items-center gap-2.5">
+          <div className="relative h-1 flex-1 rounded-full bg-border/70 overflow-hidden">
+            <motion.span
+              initial={{ width: 0 }}
+              whileInView={{ width: `${(dailyCount / pills.length) * 100}%` }}
+              viewport={{ once: true, amount: 0.5 }}
+              transition={{ duration: 0.9, delay: 0.2 + index * 0.08, ease: [0.16, 1, 0.3, 1] }}
+              className="absolute inset-y-0 left-0 rounded-full bg-foreground"
+            />
+          </div>
+          <div className="text-[10px] font-medium tabular-nums text-muted-foreground shrink-0">
+            <span className="text-foreground">{dailyCount}</span>
+            <span className="mx-0.5">·</span>
+            <span>{lang === "fr" ? "quotidien" : "daily"}</span>
+          </div>
+        </div>
+      )}
     </motion.div>
   );
 };
@@ -432,21 +443,26 @@ const Skills = () => {
             ))}
           </div>
 
-          {legend && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.4, delay: 0.3 }}
-              className="mt-8 flex items-center justify-center gap-2 text-xs text-muted-foreground"
-            >
-              <span className="relative flex h-1.5 w-1.5">
-                <span className="animate-pulse_dot absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
-              </span>
-              {legend}
-            </motion.div>
-          )}
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.4, delay: 0.3 }}
+            className="mt-8 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-[11px] text-muted-foreground"
+          >
+            <span className="inline-flex items-center gap-1.5">
+              <span className="inline-flex h-3 w-5 rounded-full border border-foreground/15 bg-foreground/[0.04]" />
+              {lang === "fr" ? "Usage quotidien" : "Daily use"}
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <span className="inline-flex h-3 w-5 rounded-full border border-border bg-card" />
+              {lang === "fr" ? "Appliqué en projet" : "Applied in projects"}
+            </span>
+            <span className="hidden sm:inline-flex items-center gap-1.5">
+              <span className="inline-flex h-1 w-5 rounded-full bg-foreground" />
+              {lang === "fr" ? "Ratio quotidien / catégorie" : "Daily ratio / category"}
+            </span>
+          </motion.div>
         </div>
       </section>
     </TooltipProvider>

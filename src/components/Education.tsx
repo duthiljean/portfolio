@@ -52,8 +52,8 @@ const DegreeProgress = ({
   endDate?: string;
 }) => {
   const progress = useMemo(() => {
-    const start = startDate ? new Date(startDate).getTime() : new Date(2023, 8, 1).getTime();
-    const end = endDate ? new Date(endDate).getTime() : new Date(2026, 5, 30).getTime();
+    const start = startDate ? new Date(startDate).getTime() : new Date(2024, 8, 1).getTime();
+    const end = endDate ? new Date(endDate).getTime() : new Date(2027, 5, 30).getTime();
     const now = Date.now();
     return Math.min(1, Math.max(0, (now - start) / (end - start)));
   }, [startDate, endDate]);
@@ -75,10 +75,10 @@ const DegreeProgress = ({
       <div className="flex items-center justify-between text-[10px] font-medium uppercase tracking-wider text-muted-foreground tabular-nums mb-2.5">
         <span className="inline-flex items-center gap-1.5">
           <span className="h-1 w-1 rounded-full bg-foreground/60" />
-          {formatDate(startDate, "Sept. 2023")}
+          {formatDate(startDate, "Sept. 2024")}
         </span>
         <span className="inline-flex items-center gap-1.5">
-          {formatDate(endDate, lang === "fr" ? "Juin 2026" : "June 2026")}
+          {formatDate(endDate, lang === "fr" ? "Juin 2027" : "June 2027")}
           <span className="h-1 w-1 rounded-full bg-foreground/60" />
         </span>
       </div>
