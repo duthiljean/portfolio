@@ -31,9 +31,17 @@ import {
 import { fallbackAbout, fallbackProfile } from "@/lib/fallback-content";
 
 const STAT_ICONS = [Target, Zap];
-const STAT_TRENDS = [
-  [8, 20, 45, 90, 145, 210, 260, 315, 360, 400],
-  [0, 1, 3, 6, 9, 13, 18, 22, 27, 30],
+
+// Real breakdown of each stat — used in the stacked distribution bar
+const STAT_BREAKDOWNS: { label: string; value: number; suffix?: string }[][] = [
+  [
+    { label: "ZEBOAT", value: 200, suffix: "+" },
+    { label: "ADAY BOAT", value: 200, suffix: "+" },
+  ],
+  [
+    { label: "ZEBOAT", value: 19 },
+    { label: "ADAY BOAT", value: 11 },
+  ],
 ];
 
 const parseStatValue = (raw: string | undefined): { value: number; suffix: string } => {
@@ -72,9 +80,13 @@ const Counter = ({
   }, [isInView, target]);
 
   return (
-    <span className="text-5xl md:text-6xl font-semibold text-foreground tabular-nums tracking-[-0.04em] leading-none">
-      {count}
-      {suffix}
+    <span className="flex items-baseline gap-0.5 text-foreground tabular-nums tracking-[-0.05em] leading-[0.9]">
+      <span className="text-[64px] md:text-[88px] font-semibold">{count}</span>
+      {suffix && (
+        <span className="text-[36px] md:text-[48px] font-medium text-foreground/80">
+          {suffix}
+        </span>
+      )}
     </span>
   );
 };
@@ -123,82 +135,6 @@ const useTilt = (maxTilt: number = 4) => {
     mx,
     my,
   };
-};
-
-const Sparkline = ({
-  points,
-  isInView,
-  delay = 0,
-  gradId,
-}: {
-  points: number[];
-  isInView: boolean;
-  delay?: number;
-  gradId: string;
-}) => {
-  const max = Math.max(...points);
-  const min = Math.min(...points);
-  const range = max - min || 1;
-  const w = 120;
-  const h = 32;
-  const step = w / (points.length - 1);
-
-  const coords = points.map((p, i) => ({
-    x: i * step,
-    y: h - ((p - min) / range) * (h - 4) - 2,
-  }));
-  const last = coords[coords.length - 1];
-
-  const line = coords
-    .map((c, i) => `${i === 0 ? "M" : "L"} ${c.x.toFixed(1)} ${c.y.toFixed(1)}`)
-    .join(" ");
-  const area = `${line} L ${w} ${h} L 0 ${h} Z`;
-
-  return (
-    <svg
-      viewBox={`0 0 ${w} ${h}`}
-      preserveAspectRatio="none"
-      className="w-full h-8 text-foreground overflow-visible"
-      aria-hidden
-    >
-      <defs>
-        <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="currentColor" stopOpacity="0.18" />
-          <stop offset="100%" stopColor="currentColor" stopOpacity="0" />
-        </linearGradient>
-      </defs>
-      <motion.path
-        d={area}
-        fill={`url(#${gradId})`}
-        initial={{ opacity: 0 }}
-        animate={isInView ? { opacity: 1 } : {}}
-        transition={{ duration: 0.8, delay, ease: [0.16, 1, 0.3, 1] }}
-      />
-      <motion.path
-        d={line}
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        initial={{ pathLength: 0 }}
-        animate={isInView ? { pathLength: 1 } : {}}
-        transition={{ duration: 1.4, delay, ease: [0.16, 1, 0.3, 1] }}
-      />
-      <g className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-        <circle
-          cx={last.x}
-          cy={last.y}
-          r="5"
-          fill="currentColor"
-          opacity="0.15"
-          className="animate-ping origin-center"
-          style={{ transformOrigin: `${last.x}px ${last.y}px` }}
-        />
-        <circle cx={last.x} cy={last.y} r="2.2" fill="currentColor" />
-      </g>
-    </svg>
-  );
 };
 
 const PhotoCard = ({
@@ -296,12 +232,13 @@ const StatCard = ({
   isInView: boolean;
   lang: "fr" | "en";
 }) => {
-  const { ref, bindings, style } = useTilt(3);
+  const { ref, bindings, style } = useTilt(2.5);
   const Icon = STAT_ICONS[index] ?? Target;
   const { value, suffix } = parseStatValue(stat.value);
-  const trend = STAT_TRENDS[index] ?? STAT_TRENDS[0];
   const kicker = pickLocale(stat.trend, lang) || (lang === "fr" ? "Stat" : "Stat");
   const label = pickLocale(stat.label, lang);
+  const breakdown = STAT_BREAKDOWNS[index];
+  const breakdownTotal = breakdown?.reduce((sum, b) => sum + b.value, 0) ?? 0;
 
   return (
     <motion.div
@@ -311,7 +248,7 @@ const StatCard = ({
       animate={isInView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.5, delay: 0.1 + index * 0.08, ease: [0.16, 1, 0.3, 1] }}
       style={style}
-      className="saas-card saas-card-hover card-spotlight group p-6 md:p-7 relative overflow-hidden"
+      className="saas-card saas-card-hover card-spotlight group p-6 md:p-8 relative overflow-hidden flex flex-col min-h-[260px]"
     >
       <div
         aria-hidden
@@ -321,31 +258,83 @@ const StatCard = ({
           WebkitMaskImage: "radial-gradient(ellipse at top right, #000 0%, transparent 70%)",
         }}
       />
-      <div className="relative">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1.5 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
-            <Icon
-              size={11}
-              strokeWidth={2}
-              className="transition-transform duration-300 group-hover:-rotate-12 group-hover:scale-110"
-            />
-            {kicker}
+
+      {/* Top : kicker */}
+      <div className="relative flex items-center gap-1.5 text-[10px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
+        <Icon
+          size={11}
+          strokeWidth={2}
+          className="transition-transform duration-300 group-hover:-rotate-12 group-hover:scale-110"
+        />
+        {kicker}
+      </div>
+
+      {/* Middle : big number + label */}
+      <div className="relative mt-7 md:mt-8 flex-1">
+        <Counter target={value} suffix={suffix} isInView={isInView} />
+        <p className="mt-3 text-sm text-muted-foreground">{label}</p>
+      </div>
+
+      {/* Bottom : distribution bar + breakdown */}
+      {breakdown && breakdownTotal > 0 && (
+        <div className="relative mt-6 flex flex-col gap-2.5">
+          <DistributionBar
+            segments={breakdown.map((b) => b.value)}
+            isInView={isInView}
+            delay={0.4 + index * 0.1}
+          />
+          <div className="flex items-center justify-between gap-2 text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+            {breakdown.map((b, i) => (
+              <div key={b.label} className="flex items-center gap-1.5">
+                <span
+                  className={`inline-block h-1.5 w-1.5 rounded-full ${
+                    i === 0 ? "bg-foreground" : "bg-foreground/30"
+                  }`}
+                />
+                <span>{b.label}</span>
+                <span className="text-foreground/90 tabular-nums">
+                  {b.value}
+                  {b.suffix ?? ""}
+                </span>
+              </div>
+            ))}
           </div>
         </div>
-        <div className="mt-6 md:mt-7">
-          <Counter target={value} suffix={suffix} isInView={isInView} />
-        </div>
-        <p className="mt-2 text-sm text-muted-foreground">{label}</p>
-        <div className="mt-5 text-foreground/60 group-hover:text-foreground/90 transition-colors duration-300">
-          <Sparkline
-            points={trend}
-            isInView={isInView}
-            delay={0.35 + index * 0.1}
-            gradId={`spark-${index}`}
-          />
-        </div>
-      </div>
+      )}
     </motion.div>
+  );
+};
+
+const DistributionBar = ({
+  segments,
+  isInView,
+  delay = 0,
+}: {
+  segments: number[];
+  isInView: boolean;
+  delay?: number;
+}) => {
+  const total = segments.reduce((a, b) => a + b, 0) || 1;
+  return (
+    <div
+      className="flex h-1 w-full overflow-hidden rounded-full bg-foreground/[0.06]"
+      role="presentation"
+      aria-hidden
+    >
+      {segments.map((seg, i) => {
+        const pct = (seg / total) * 100;
+        return (
+          <motion.span
+            key={i}
+            initial={{ width: 0 }}
+            animate={isInView ? { width: `${pct}%` } : { width: 0 }}
+            transition={{ duration: 0.7, delay: delay + i * 0.08, ease: [0.16, 1, 0.3, 1] }}
+            className={`h-full ${i === 0 ? "bg-foreground" : "bg-foreground/30"}`}
+            style={{ marginLeft: i === 0 ? 0 : 2 }}
+          />
+        );
+      })}
+    </div>
   );
 };
 

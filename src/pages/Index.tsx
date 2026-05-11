@@ -6,7 +6,7 @@ import ExperienceSection from "@/components/ExperienceSection";
 import AddetectiveShowcase from "@/components/AddetectiveShowcase";
 import Education from "@/components/Education";
 import Contact, { Footer } from "@/components/Contact";
-import ScrollToTop from "@/components/ScrollToTop";
+import ChatWidget from "@/components/ChatWidget";
 import { LanguageProvider } from "@/i18n/LanguageContext";
 
 const Index = () => (
@@ -20,7 +20,7 @@ const Index = () => (
     <Skills />
     <Contact />
     <Footer />
-    <ScrollToTop />
+    <ChatWidget />
   </LanguageProvider>
 );
 
