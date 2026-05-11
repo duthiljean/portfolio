@@ -211,6 +211,35 @@ export default function ChatWidget() {
     inputRef.current.focus();
   }, [isOpen]);
 
+  // Lock body scroll on mobile when chat is open — prevents iOS Safari
+  // from scrolling the page when the keyboard opens (which would reveal
+  // the portfolio behind the panel).
+  useEffect(() => {
+    if (!isOpen || typeof window === "undefined") return;
+    const isTouch = window.matchMedia("(hover: none) and (pointer: coarse)").matches;
+    if (!isTouch) return;
+
+    const scrollY = window.scrollY;
+    const body = document.body;
+    const prevPosition = body.style.position;
+    const prevTop = body.style.top;
+    const prevWidth = body.style.width;
+    const prevOverflow = body.style.overflow;
+
+    body.style.position = "fixed";
+    body.style.top = `-${scrollY}px`;
+    body.style.width = "100%";
+    body.style.overflow = "hidden";
+
+    return () => {
+      body.style.position = prevPosition;
+      body.style.top = prevTop;
+      body.style.width = prevWidth;
+      body.style.overflow = prevOverflow;
+      window.scrollTo(0, scrollY);
+    };
+  }, [isOpen]);
+
   const sendMessage = async (text: string) => {
     const trimmed = text.trim();
     if (!trimmed || isStreaming) return;
