@@ -202,9 +202,13 @@ export default function ChatWidget() {
   }, [messages, isStreaming]);
 
   useEffect(() => {
-    if (isOpen && inputRef.current) {
-      inputRef.current.focus();
+    if (!isOpen || !inputRef.current) return;
+    // Skip auto-focus on touch devices — avoids keyboard popping up immediately
+    if (typeof window !== "undefined") {
+      const isTouch = window.matchMedia("(hover: none) and (pointer: coarse)").matches;
+      if (isTouch) return;
     }
+    inputRef.current.focus();
   }, [isOpen]);
 
   const sendMessage = async (text: string) => {
@@ -1047,7 +1051,7 @@ function PromptPill({
             onKeyDown={onKeyDown}
             placeholder={placeholder}
             rows={1}
-            className="block w-full resize-none border-0 bg-transparent px-2 pt-1 pb-0 text-[14px] leading-relaxed text-foreground placeholder:text-muted-foreground/70 focus:outline-none focus:ring-0"
+            className="block w-full resize-none border-0 bg-transparent px-2 pt-1 pb-0 text-[16px] sm:text-[14px] leading-relaxed text-foreground placeholder:text-muted-foreground/70 focus:outline-none focus:ring-0"
             style={{ maxHeight: `${PROMPT_MAX_HEIGHT}px` }}
           />
         )}
