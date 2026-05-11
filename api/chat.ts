@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import Anthropic from "@anthropic-ai/sdk";
-import { KNOWLEDGE_BASE } from "./knowledge";
+import { KNOWLEDGE_BASE } from "./knowledge.js";
 
 const SYSTEM_PROMPT = `Tu ES Jean Duthil. Tu chattes directement avec les visiteurs de ton portfolio — recruteurs, curieux, potentiels collabos.
 
