@@ -473,10 +473,10 @@ export default function ChatWidget() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.96 }}
             transition={transition}
-            className="fixed bottom-5 right-5 z-50 flex h-[min(640px,calc(100vh-2.5rem))] w-[min(420px,calc(100vw-2.5rem))] flex-col overflow-hidden rounded-2xl border border-border bg-background shadow-[0_20px_60px_rgb(0,0,0,0.22)]"
+            className="fixed inset-0 sm:inset-auto sm:bottom-5 sm:right-5 z-50 flex h-[100dvh] sm:h-[min(640px,calc(100vh-2.5rem))] w-full sm:w-[min(420px,calc(100vw-2.5rem))] flex-col overflow-hidden rounded-none sm:rounded-2xl border-0 sm:border sm:border-border bg-background shadow-none sm:shadow-[0_20px_60px_rgb(0,0,0,0.22)]"
           >
             {/* Header */}
-            <div className="flex items-center justify-between border-b border-border bg-background px-4 py-3">
+            <div className="flex items-center justify-between border-b border-border bg-background px-4 py-3 max-sm:pt-[max(0.75rem,env(safe-area-inset-top))]">
               <div className="flex items-center gap-3">
                 <div className="relative h-14 w-14 shrink-0">
                   <div className="relative flex h-full w-full items-center justify-center overflow-hidden rounded-full bg-muted ring-1 ring-border">
@@ -615,7 +615,7 @@ export default function ChatWidget() {
             </div>
 
             {/* Input — pill design inspired by premium chat UIs */}
-            <div className="px-3 pb-3 pt-2">
+            <div className="px-3 pt-2 pb-3 max-sm:pb-[max(0.75rem,env(safe-area-inset-bottom))]">
               <PromptPill
                 value={input}
                 onChange={(v) => setInput(v.slice(0, MAX_MESSAGE_LENGTH))}
@@ -661,7 +661,7 @@ function WelcomeScreen({ intro, heading, starters, onPick, prefersReducedMotion 
         </h3>
       </div>
 
-      <div className="grid grid-cols-2 gap-2">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
         {starters.map((s, i) => {
           const Icon = s.icon;
           return (
