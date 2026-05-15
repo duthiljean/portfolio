@@ -8,7 +8,6 @@ import {
   Sparkle,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useQuery } from "@tanstack/react-query";
 import esscaLogo from "@/assets/essca-logo.jpeg";
 import moocCert from "@/assets/mooc-creative-box-cert.webp";
 import anthropicLogo from "@/assets/anthropic-logo.png";
@@ -16,9 +15,7 @@ import competencesMetiersLogo from "@/assets/competences-metiers-logo.jpeg";
 import lovableLogo from "@/assets/lovable-logo.jpeg";
 import { useLanguage } from "@/i18n/LanguageContext";
 import {
-  fetchEducation,
   pickLocale,
-  type Education as EducationDoc,
   type Certification,
   type Degree,
 } from "@/lib/sanity";
@@ -539,13 +536,7 @@ const CertCard = ({
 const Education = () => {
   const { lang } = useLanguage();
   const [openCert, setOpenCert] = useState<string | null>(null);
-
-  const { data: educationData } = useQuery<EducationDoc | null>({
-    queryKey: ["education"],
-    queryFn: fetchEducation,
-  });
-
-  const education = educationData ?? fallbackEducation;
+  const education = fallbackEducation;
   const title = pickLocale(education.title, lang);
   const dateline = pickLocale(education.dateline, lang);
   const certsLabel = pickLocale(education.certsLabel, lang);

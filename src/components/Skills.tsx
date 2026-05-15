@@ -12,7 +12,6 @@ import {
   LineChart,
   BadgeCheck,
 } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
 import claudeLogo from "@/assets/claude-logo.png";
 import chatgptLogo from "@/assets/chatgpt-logo.png";
 import vscodeLogo from "@/assets/vscode-logo.svg";
@@ -26,7 +25,6 @@ import {
 } from "@/components/ui/tooltip";
 import { useLanguage } from "@/i18n/LanguageContext";
 import {
-  fetchSkills,
   pickLocale,
   type SkillCategory,
   type SkillPill as SkillPillType,
@@ -364,12 +362,7 @@ const CategoryCard = ({
 
 const Skills = () => {
   const { lang } = useLanguage();
-  const { data: skillsData } = useQuery<SkillsSection | null>({
-    queryKey: ["skills"],
-    queryFn: fetchSkills,
-  });
-
-  const skills = skillsData ?? fallbackSkills;
+  const skills: SkillsSection = fallbackSkills;
   const categories = skills.categories ?? [];
   const dailyStack = skills.dailyStack ?? [];
   const dailyToolNames = new Set(dailyStack.map((t) => t.name));
