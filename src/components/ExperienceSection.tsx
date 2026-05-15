@@ -1,9 +1,9 @@
-import { useMemo, useRef, useState, useEffect } from "react";
+import { useMemo, useRef, useState } from "react";
 import { ChevronDown, MapPin, ArrowUpRight } from "lucide-react";
 import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 import { track } from "@vercel/analytics";
 import { experiences as localExperiences } from "./experienceData";
-import { fetchExperiences, type Experience as SanityExperience } from "@/lib/sanity";
+import { type Experience as SanityExperience } from "@/lib/sanity";
 import { useLanguage } from "@/i18n/LanguageContext";
 
 type FilterId = "all" | "pro" | "project" | "asso";
@@ -418,26 +418,8 @@ const FilterTabs = ({
 const ExperienceSection = () => {
   const { t, lang } = useLanguage();
   const [filter, setFilter] = useState<FilterId>("all");
-  const [experiences, setExperiences] = useState<SanityExperience[]>(fallbackExperiences);
+  const experiences: SanityExperience[] = fallbackExperiences;
   const [openId, setOpenId] = useState<string | null>(fallbackExperiences[0]?._id ?? null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetchExperiences()
-      .then((data) => {
-        if (data.length > 0) {
-          setExperiences(data);
-          setOpenId(data[0]._id);
-        } else {
-          setOpenId(fallbackExperiences[0]?._id ?? null);
-        }
-      })
-      .catch((err) => {
-        console.error("[Sanity] Failed to fetch experiences:", err);
-        setOpenId(fallbackExperiences[0]?._id ?? null);
-      })
-      .finally(() => setLoading(false));
-  }, []);
 
   const enriched = useMemo(
     () =>
@@ -528,7 +510,7 @@ const ExperienceSection = () => {
           </motion.div>
         </LayoutGroup>
 
-        {!loading && visible.length === 0 && (
+        {visible.length === 0 && (
           <p className="mt-10 text-sm text-muted-foreground">
             {lang === "fr" ? "Aucune expérience dans ce filtre." : "No experience in this filter."}
           </p>
