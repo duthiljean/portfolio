@@ -37,6 +37,7 @@ export type BadgeItem = {
 
 export type Experience = {
   _id: string
+  i18nKey?: string
   title: string
   company: string
   type: string

@@ -24,6 +24,7 @@ import { toast } from "sonner";
 import { track } from "@vercel/analytics";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 const EMAIL = "jean.duthil13@gmail.com";
 
@@ -97,6 +98,7 @@ const useParisClock = () => {
 
 /* ─────────── Primary Email Card ─────────── */
 const EmailHero = ({ mailto, lang }: { mailto: string; lang: "fr" | "en" }) => {
+  const { t } = useLanguage();
   const { ref: spotRef, onPointerMove: onSpotMove } = useSpotlight<HTMLDivElement>();
   const { ref: tiltRef, rx, ry, onPointerMove: onTiltMove, onPointerLeave } = useTilt(2.5);
   const [copied, setCopied] = useState(false);
@@ -106,12 +108,12 @@ const EmailHero = ({ mailto, lang }: { mailto: string; lang: "fr" | "en" }) => {
       await navigator.clipboard.writeText(EMAIL);
       setCopied(true);
       track("contact_email_copied");
-      toast.success("Email copié", {
-        description: "Collé dans le presse-papiers.",
+      toast.success(t("contact.toast.emailCopied"), {
+        description: t("contact.toast.emailCopiedDesc"),
       });
       window.setTimeout(() => setCopied(false), 2000);
     } catch {
-      toast.error("Copie impossible");
+      toast.error(t("contact.toast.copyFailed"));
     }
   };
 
@@ -164,7 +166,7 @@ const EmailHero = ({ mailto, lang }: { mailto: string; lang: "fr" | "en" }) => {
           <button
             type="button"
             onClick={handleCopy}
-            aria-label="Copier l'email"
+            aria-label={t("contact.aria.copyEmail")}
             className="group/email mt-6 flex items-start gap-2 text-left w-full min-w-0"
           >
             <span className="min-w-0 flex-1 text-[18px] sm:text-2xl md:text-[32px] font-semibold tracking-[-0.02em] [overflow-wrap:anywhere] text-foreground leading-tight">
@@ -360,70 +362,107 @@ const PdfFileCard = () => (
   </div>
 );
 
-/* ─────────── CV Tile (featured, with PdfFileCard) ─────────── */
+/* ─────────── CV Tile (featured, with PdfFileCard + language picker) ─────────── */
 const CvTile = ({
-  onClick,
+  onPick,
   disabled,
   loading,
   delay,
-  lang,
 }: {
-  onClick: () => void;
+  onPick: (cvLang: "fr" | "en") => void;
   disabled?: boolean;
   loading?: boolean;
   delay: number;
-  lang: "fr" | "en";
 }) => {
+  const { t } = useLanguage();
   const { ref, onPointerMove } = useSpotlight<HTMLDivElement>();
+  const [open, setOpen] = useState(false);
+
+  const handlePick = (cvLang: "fr" | "en") => {
+    setOpen(false);
+    onPick(cvLang);
+  };
 
   return (
-    <motion.button
-      type="button"
-      onClick={onClick}
-      disabled={disabled}
-      aria-label="Télécharger le CV en PDF"
+    <motion.div
       initial={{ opacity: 0, y: 16 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.5, delay, ease: [0.16, 1, 0.3, 1] }}
-      className="block text-left disabled:cursor-wait"
+      className="block text-left"
     >
-      <div
-        ref={ref}
-        onPointerMove={onPointerMove}
-        className="saas-card saas-card-hover card-spotlight p-5 md:p-6 flex items-center justify-between group h-full relative overflow-hidden disabled:opacity-60"
-      >
-        <div className="flex items-center gap-3 min-w-0">
-          <motion.div
-            whileHover={{ rotate: -6, y: -1 }}
-            transition={{ type: "spring", stiffness: 320, damping: 18 }}
-            className="shrink-0"
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <button
+            type="button"
+            disabled={disabled}
+            aria-label={t("contact.aria.downloadCv")}
+            className="block text-left w-full disabled:cursor-wait"
           >
-            {loading ? (
-              <div className="w-9 h-11 rounded-[5px] bg-card ring-1 ring-border flex items-center justify-center">
-                <Loader2 size={14} className="animate-spin text-foreground" />
+            <div
+              ref={ref}
+              onPointerMove={onPointerMove}
+              className="saas-card saas-card-hover card-spotlight p-5 md:p-6 flex items-center justify-between group h-full relative overflow-hidden disabled:opacity-60"
+            >
+              <div className="flex items-center gap-3 min-w-0">
+                <motion.div
+                  whileHover={{ rotate: -6, y: -1 }}
+                  transition={{ type: "spring", stiffness: 320, damping: 18 }}
+                  className="shrink-0"
+                >
+                  {loading ? (
+                    <div className="w-9 h-11 rounded-[5px] bg-card ring-1 ring-border flex items-center justify-center">
+                      <Loader2 size={14} className="animate-spin text-foreground" />
+                    </div>
+                  ) : (
+                    <PdfFileCard />
+                  )}
+                </motion.div>
+                <div className="min-w-0">
+                  <div className="text-sm font-semibold text-foreground truncate">
+                    {loading ? t("contact.cv.generating") : t("contact.cv.download")}
+                  </div>
+                  <div className="text-xs text-muted-foreground truncate tabular-nums">
+                    PDF · FR / EN
+                  </div>
+                </div>
               </div>
-            ) : (
-              <PdfFileCard />
-            )}
-          </motion.div>
-          <div className="min-w-0">
-            <div className="text-sm font-semibold text-foreground truncate">
-              {loading
-                ? lang === "fr" ? "Génération…" : "Generating..."
-                : lang === "fr" ? "Télécharger le CV" : "Download resume"}
+              <ArrowUpRight
+                size={16}
+                className="text-muted-foreground group-hover:text-foreground group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all shrink-0"
+              />
             </div>
-            <div className="text-xs text-muted-foreground truncate tabular-nums">
-              PDF · ~120 Ko
-            </div>
+          </button>
+        </PopoverTrigger>
+        <PopoverContent align="end" className="w-56 p-1.5">
+          <div className="px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+            {t("contact.cv.pick")}
           </div>
-        </div>
-        <ArrowUpRight
-          size={16}
-          className="text-muted-foreground group-hover:text-foreground group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all shrink-0"
-        />
-      </div>
-    </motion.button>
+          <button
+            type="button"
+            onClick={() => handlePick("fr")}
+            className="w-full flex items-center justify-between gap-2 rounded-md px-2.5 py-2 text-sm text-foreground hover:bg-muted transition-colors"
+          >
+            <span className="flex items-center gap-2">
+              <span aria-hidden className="text-base leading-none">🇫🇷</span>
+              <span>{t("contact.cv.fr")}</span>
+            </span>
+            <ArrowUpRight size={13} className="text-muted-foreground shrink-0" />
+          </button>
+          <button
+            type="button"
+            onClick={() => handlePick("en")}
+            className="w-full flex items-center justify-between gap-2 rounded-md px-2.5 py-2 text-sm text-foreground hover:bg-muted transition-colors"
+          >
+            <span className="flex items-center gap-2">
+              <span aria-hidden className="text-base leading-none">🇬🇧</span>
+              <span>{t("contact.cv.en")}</span>
+            </span>
+            <ArrowUpRight size={13} className="text-muted-foreground shrink-0" />
+          </button>
+        </PopoverContent>
+      </Popover>
+    </motion.div>
   );
 };
 
@@ -521,27 +560,31 @@ const ActionTile = ({
 
 /* ─────────── Main Contact section ─────────── */
 const Contact = () => {
-  const { lang } = useLanguage();
+  const { lang, t } = useLanguage();
   const [generating, setGenerating] = useState(false);
 
-  const handleDownloadCV = async () => {
+  const handleDownloadCV = async (cvLang: "fr" | "en") => {
     if (generating) return;
     setGenerating(true);
     try {
       const link = document.createElement("a");
-      link.href = "/documents/cv-jean-duthil.pdf";
-      link.download = "CV-Jean-Duthil.pdf";
+      link.href =
+        cvLang === "en"
+          ? "/documents/cv-jean-duthil-en.pdf"
+          : "/documents/cv-jean-duthil.pdf";
+      link.download =
+        cvLang === "en" ? "Jean-Duthil-Resume.pdf" : "CV-Jean-Duthil.pdf";
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      track("cv_downloaded", { lang });
-      toast.success("CV téléchargé", {
-        description: "Vérifie ton dossier Téléchargements.",
+      track("cv_downloaded", { lang, cvLang });
+      toast.success(t("contact.toast.cvDownloaded"), {
+        description: t("contact.toast.cvDownloadedDesc"),
       });
     } catch (err) {
       console.error("CV download failed:", err);
-      toast.error("Échec du téléchargement", {
-        description: "Réessaie dans un instant.",
+      toast.error(t("contact.toast.downloadFailed"), {
+        description: t("contact.toast.tryAgainDesc"),
       });
     } finally {
       setGenerating(false);
@@ -627,11 +670,10 @@ const Contact = () => {
             onClick={() => track("contact_phone_clicked")}
           />
           <CvTile
-            onClick={handleDownloadCV}
+            onPick={handleDownloadCV}
             disabled={generating}
             loading={generating}
             delay={0.36}
-            lang={lang as "fr" | "en"}
           />
         </div>
       </div>
@@ -640,11 +682,12 @@ const Contact = () => {
 };
 
 const Footer = () => {
+  const { t } = useLanguage();
   return (
     <footer className="border-t border-border py-6 px-5 md:px-8 bg-background">
       <div className="container mx-auto max-w-5xl flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-muted-foreground">
         <span>&copy; {new Date().getFullYear()} Jean Duthil</span>
-        <span>Construit avec l'IA</span>
+        <span>{t("footer.made")}</span>
       </div>
     </footer>
   );

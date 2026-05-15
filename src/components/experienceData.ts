@@ -13,6 +13,7 @@ export interface BadgeItem {
 }
 
 export interface Experience {
+  i18nKey: string;
   title: string;
   company: string;
   type: string;
@@ -27,6 +28,7 @@ export interface Experience {
 
 export const experiences: Experience[] = [
   {
+    i18nKey: "roofwander",
     title: "Business Developer & Partnerships",
     company: "Roofwander",
     type: "Stage",
@@ -39,6 +41,7 @@ export const experiences: Experience[] = [
     siteUrl: "https://roofwander.com/fr",
   },
   {
+    i18nKey: "addetective",
     title: "Fondateur — SaaS IA",
     company: "AdDetective",
     type: "Projet entrepreneurial",
@@ -51,6 +54,7 @@ export const experiences: Experience[] = [
     siteUrl: "https://addetective.fr",
   },
   {
+    i18nKey: "adayboat",
     title: "Boat Manager",
     company: "ADAY BOAT",
     type: "Stage",
@@ -63,6 +67,7 @@ export const experiences: Experience[] = [
     siteUrl: "https://www.adayboat.com",
   },
   {
+    i18nKey: "zeboat",
     title: "Boat Manager",
     company: "ZEBOAT Marseille",
     type: "CDD",
@@ -75,6 +80,7 @@ export const experiences: Experience[] = [
     siteUrl: "https://www.zeboat.fr",
   },
   {
+    i18nKey: "bde",
     title: "Responsable Pôle Événementiel",
     company: "BDE Esscalibur · ESSCA Bordeaux",
     type: "Associatif",
@@ -86,6 +92,7 @@ export const experiences: Experience[] = [
     logo: bdeLogo,
   },
   {
+    i18nKey: "coquille",
     title: "Co-fondateur",
     company: "MaPetiteCoquille",
     type: "Indépendant",
@@ -98,6 +105,7 @@ export const experiences: Experience[] = [
     image: mapetitecoquilleCollection,
   },
   {
+    i18nKey: "armees",
     title: "Stagiaire découverte",
     company: "Ministère des Armées",
     type: "Stage",

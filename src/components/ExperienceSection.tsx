@@ -45,6 +45,7 @@ const imageFallback = localExperiences.reduce<Record<string, string | undefined>
 
 const fallbackExperiences: SanityExperience[] = localExperiences.map((exp, index) => ({
   _id: `fallback-${index}-${exp.company.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`,
+  i18nKey: exp.i18nKey,
   title: exp.title,
   company: exp.company,
   type: exp.type,
@@ -87,13 +88,28 @@ const ExperienceCard = ({
   const logoUrl = exp.logo?.asset?.url ?? logoFallback[exp.company];
   const imageUrl = exp.image?.asset?.url ?? imageFallback[exp.company];
 
-  const isCurrent = exp.dates.includes("Présent") || exp.dates.includes("Present");
+  // Resolve localized field via i18nKey, fall back to raw Sanity/local value
+  const tx = (field: string, fallback: string) => {
+    if (!exp.i18nKey) return fallback;
+    const key = `exp.${exp.i18nKey}.${field}`;
+    const value = t(key);
+    return value === key ? fallback : value;
+  };
+
+  const localizedTitle = tx("title", exp.title);
+  const localizedType = tx("type", exp.type);
+  const localizedDates = tx("dates", exp.dates);
+  const localizedLocation = tx("location", exp.location);
+  const localizedDescription = tx("description", exp.description);
+
+  const isCurrent =
+    localizedDates.includes("Présent") || localizedDates.includes("Present");
 
   const panelId = `exp-panel-${exp._id}`;
   const buttonId = `exp-button-${exp._id}`;
 
   // Split description: first line = summary, "→" lines = bullets
-  const lines = exp.description.split("\n");
+  const lines = localizedDescription.split("\n");
   const summary = !lines[0]?.startsWith("→") ? lines[0] : null;
   const bullets = lines
     .slice(summary ? 1 : 0)
@@ -154,7 +170,7 @@ const ExperienceCard = ({
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2 flex-wrap">
                 <h3 className="font-semibold text-sm md:text-base text-foreground leading-tight">
-                  {exp.title}
+                  {localizedTitle}
                 </h3>
                 {isCurrent && (
                   <span
@@ -170,15 +186,15 @@ const ExperienceCard = ({
               <p className="text-sm text-muted-foreground mt-1">
                 <span className="text-foreground/75 font-medium">{exp.company}</span>
                 <span className="mx-1.5 text-border">·</span>
-                <span>{exp.location}</span>
+                <span>{localizedLocation}</span>
               </p>
 
               <div className="mt-2.5 flex items-center gap-2 flex-wrap">
                 <span className="inline-flex items-center rounded-md px-1.5 py-0.5 text-[10.5px] font-medium bg-muted text-foreground">
-                  {exp.type}
+                  {localizedType}
                 </span>
                 <span className="text-[11px] text-muted-foreground tabular-nums">
-                  {exp.dates}
+                  {localizedDates}
                 </span>
               </div>
             </div>
@@ -292,8 +308,9 @@ const ExperienceCard = ({
                 }}
                 className="flex flex-wrap gap-1.5 mt-4 items-center"
               >
-                {(exp.badges ?? []).map((b) =>
-                  b.link ? (
+                {(exp.badges ?? []).map((b, badgeIndex) => {
+                  const label = tx(`badge${badgeIndex + 1}`, b.label);
+                  return b.link ? (
                     <a
                       key={b._key ?? b.label}
                       href={b.link}
@@ -301,7 +318,7 @@ const ExperienceCard = ({
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium border border-border bg-card text-foreground hover:border-foreground/30 hover:-translate-y-px transition-all duration-200"
                     >
-                      {b.label}
+                      {label}
                       <ArrowUpRight size={10} className="shrink-0" />
                     </a>
                   ) : (
@@ -309,10 +326,10 @@ const ExperienceCard = ({
                       key={b._key ?? b.label}
                       className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-medium border border-border text-muted-foreground transition-colors hover:border-foreground/20 hover:text-foreground"
                     >
-                      {b.label}
+                      {label}
                     </span>
-                  ),
-                )}
+                  );
+                })}
 
                 {exp.siteUrl && (
                   <a
