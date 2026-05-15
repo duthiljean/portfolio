@@ -149,13 +149,14 @@ export type SubCert = {
 
 export type Certification = {
   _key?: string
-  kind: 'anthropic' | 'mooc' | 'simple'
+  kind: 'anthropic' | 'mooc' | 'simple' | 'lovable'
   name: string
   org?: LocaleString
   logo?: string
   verified?: boolean
   subCerts?: SubCert[]
   certImage?: string
+  url?: string
   order?: number
 }
 

@@ -13,6 +13,7 @@ import esscaLogo from "@/assets/essca-logo.jpeg";
 import moocCert from "@/assets/mooc-creative-box-cert.webp";
 import anthropicLogo from "@/assets/anthropic-logo.png";
 import competencesMetiersLogo from "@/assets/competences-metiers-logo.jpeg";
+import lovableLogo from "@/assets/lovable-logo.jpeg";
 import { useLanguage } from "@/i18n/LanguageContext";
 import {
   fetchEducation,
@@ -22,11 +23,49 @@ import {
   type Degree,
 } from "@/lib/sanity";
 import { fallbackEducation } from "@/lib/fallback-content";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+
+const LOVABLE_TIERS: { name: string; level: number; desc: { fr: string; en: string } }[] = [
+  {
+    name: "Bronze",
+    level: 1,
+    desc: { fr: "Expérimente le vibe coding.", en: "Experiments with vibe coding." },
+  },
+  {
+    name: "Silver",
+    level: 2,
+    desc: { fr: "Itère régulièrement.", en: "Regularly iterates with vibe coding." },
+  },
+  {
+    name: "Gold",
+    level: 3,
+    desc: { fr: "Pratique en continu.", en: "Sustains ongoing vibe coding." },
+  },
+  {
+    name: "Platinum",
+    level: 4,
+    desc: { fr: "Opère à grande échelle.", en: "Operates at high scale with vibe coding." },
+  },
+  {
+    name: "Diamond",
+    level: 5,
+    desc: {
+      fr: "Maîtrise soutenue à grande échelle.",
+      en: "Demonstrates sustained, high-scale vibe coding.",
+    },
+  },
+];
 
 const FALLBACK_LOGOS: Record<string, string> = {
   anthropic: anthropicLogo,
   mooc: esscaLogo,
   simple: competencesMetiersLogo,
+  lovable: lovableLogo,
 };
 
 const useSpotlight = <T extends HTMLElement>() => {
@@ -307,11 +346,17 @@ const CertCard = ({
             <ChevronDown size={15} />
           </motion.div>
         )}
+        {!expandable && cert.url && (
+          <ArrowUpRight
+            size={14}
+            className="text-muted-foreground/60 transition-all duration-200 group-hover:text-foreground group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+          />
+        )}
       </div>
     </div>
   );
 
-  return (
+  const card = (
     <motion.div
       ref={ref}
       onPointerMove={onPointerMove}
@@ -335,6 +380,15 @@ const CertCard = ({
         >
           {Header}
         </button>
+      ) : cert.url ? (
+        <a
+          href={cert.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block p-5 transition-colors hover:bg-secondary/40"
+        >
+          {Header}
+        </a>
       ) : (
         <div className="p-5">{Header}</div>
       )}
@@ -415,6 +469,71 @@ const CertCard = ({
       </AnimatePresence>
     </motion.div>
   );
+
+  if (cert.kind === "lovable") {
+    const currentLevel = 4;
+    return (
+      <Tooltip delayDuration={150}>
+        <TooltipTrigger asChild>{card}</TooltipTrigger>
+        <TooltipContent
+          side="top"
+          align="center"
+          className="max-w-[280px] p-0 overflow-hidden"
+        >
+          <div className="px-3 py-2.5 border-b border-border bg-card">
+            <div className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+              Lovable · Vibe Coding
+            </div>
+            <div className="text-[12px] font-semibold text-foreground mt-0.5">
+              {lang === "fr" ? "Paliers de progression" : "Progression tiers"}
+            </div>
+          </div>
+          <ul className="p-1.5">
+            {LOVABLE_TIERS.map((tier) => {
+              const isCurrent = tier.level === currentLevel;
+              return (
+                <li
+                  key={tier.name}
+                  className={`flex items-start gap-2 rounded-md px-2 py-1.5 ${
+                    isCurrent ? "bg-foreground/[0.06]" : ""
+                  }`}
+                >
+                  <span
+                    className={`mt-1 inline-flex h-1.5 w-1.5 shrink-0 rounded-full ${
+                      isCurrent ? "bg-foreground" : "bg-border"
+                    }`}
+                  />
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-1.5">
+                      <span
+                        className={`text-[11px] font-semibold tabular-nums ${
+                          isCurrent ? "text-foreground" : "text-muted-foreground"
+                        }`}
+                      >
+                        L{tier.level} · {tier.name}
+                      </span>
+                      {isCurrent && (
+                        <BadgeCheck size={11} className="text-foreground shrink-0" />
+                      )}
+                    </div>
+                    <div
+                      className={`text-[11px] leading-snug ${
+                        isCurrent ? "text-foreground/80" : "text-muted-foreground"
+                      }`}
+                    >
+                      {pickLocale(tier.desc, lang)}
+                    </div>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </TooltipContent>
+      </Tooltip>
+    );
+  }
+
+  return card;
 };
 
 const Education = () => {
@@ -433,11 +552,12 @@ const Education = () => {
   const certifications = education.certifications ?? [];
 
   return (
-    <section
-      id="education"
-      className="relative py-16 sm:py-20 md:py-28 px-5 md:px-8 section-alt-bg border-t border-border"
-    >
-      <div className="container mx-auto max-w-5xl">
+    <TooltipProvider delayDuration={200}>
+      <section
+        id="education"
+        className="relative py-16 sm:py-20 md:py-28 px-5 md:px-8 section-alt-bg border-t border-border"
+      >
+        <div className="container mx-auto max-w-5xl">
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -488,7 +608,7 @@ const Education = () => {
               </span>
             </motion.div>
 
-            <div className="mt-3 md:mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="mt-3 md:mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {certifications.map((cert, i) => {
                 const id = cert._key ?? String(i);
                 return (
@@ -505,8 +625,9 @@ const Education = () => {
             </div>
           </>
         )}
-      </div>
-    </section>
+        </div>
+      </section>
+    </TooltipProvider>
   );
 };
 

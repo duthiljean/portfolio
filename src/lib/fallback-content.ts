@@ -100,6 +100,7 @@ export const fallbackSkills: SkillsSection = {
       pills: [
         { _key: "claude", name: "Claude", tooltipType: "daily" },
         { _key: "chatgpt", name: "ChatGPT", tooltipType: "daily" },
+        { _key: "codex", name: "Codex", tooltipType: "daily" },
         { _key: "gemini", name: "Gemini", tooltipType: "daily" },
         { _key: "vscode", name: "VS Code", tooltipType: "daily" },
         { _key: "github", name: "GitHub", tooltipType: "project" },
@@ -142,6 +143,7 @@ export const fallbackSkills: SkillsSection = {
   ],
   dailyStack: [
     { _key: "claude", name: "Claude", use: { fr: "Raisonnement & code", en: "Reasoning & code" } },
+    { _key: "codex", name: "Codex", use: { fr: "Agent de code", en: "Coding agent" } },
     { _key: "chatgpt", name: "ChatGPT", use: { fr: "Recherche & idées", en: "Research & ideas" } },
     { _key: "gemini", name: "Gemini", use: { fr: "Analyse & synthèse", en: "Analysis & synthesis" } },
     { _key: "vscode", name: "VS Code", use: { fr: "Éditeur de code", en: "Code editor" } },
@@ -150,7 +152,7 @@ export const fallbackSkills: SkillsSection = {
 
 export const fallbackEducation: Education = {
   title: { fr: "Formation", en: "Education" },
-  dateline: { fr: "1 diplôme · 3 certifications", en: "1 degree · 3 certifications" },
+  dateline: { fr: "1 diplôme · 4 certifications", en: "1 degree · 4 certifications" },
   degree: {
     kicker: { fr: "Bachelor · International Business", en: "Bachelor · International Business" },
     schoolName: "ESSCA School of Management",
@@ -195,6 +197,15 @@ export const fallbackEducation: Education = {
       org: { fr: "Compétences et Métiers · 2024", en: "Compétences et Métiers · 2024" },
       verified: false,
       order: 3,
+    },
+    {
+      _key: "lovable-vibe",
+      kind: "lovable",
+      name: "Vibe Coding — L4 Platinum",
+      org: { fr: "Lovable · mai 2026", en: "Lovable · May 2026" },
+      verified: true,
+      url: "https://www.linkedin.com/in/duthiljean/details/certifications/",
+      order: 4,
     },
   ],
 };

@@ -17,6 +17,7 @@ import claudeLogo from "@/assets/claude-logo.png";
 import chatgptLogo from "@/assets/chatgpt-logo.png";
 import vscodeLogo from "@/assets/vscode-logo.svg";
 import geminiLogo from "@/assets/gemini-logo.jpeg";
+import codexLogo from "@/assets/codex-color.png";
 import {
   Tooltip,
   TooltipContent,
@@ -38,6 +39,7 @@ const pillLogos: Record<string, string> = {
   ChatGPT: chatgptLogo,
   "VS Code": vscodeLogo,
   Gemini: geminiLogo,
+  Codex: codexLogo,
 };
 
 const ICON_MAP = {
@@ -212,7 +214,7 @@ const DailyStackCard = ({
             </div>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 md:gap-2.5 flex-1 md:max-w-[540px]">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 md:gap-2.5 flex-1 md:max-w-[640px]">
             {tools.map((tool, i) => {
               const logo = tool.logo || pillLogos[tool.name];
               return (
