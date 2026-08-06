@@ -48,6 +48,8 @@ export type Experience = {
   logo?: {asset?: {url?: string}}
   siteUrl?: string
   image?: {asset?: {url?: string}}
+  /** "upcoming" = signé mais pas encore commencé · "current" = en cours */
+  status?: 'upcoming' | 'current'
   order: number
 }
 
@@ -138,6 +140,7 @@ export type Degree = {
   durationLabel?: LocaleString
   location?: string
   bdeLabel?: LocaleString
+  apprenticeshipLabel?: LocaleString
   startDate?: string
   endDate?: string
 }
@@ -150,7 +153,7 @@ export type SubCert = {
 
 export type Certification = {
   _key?: string
-  kind: 'anthropic' | 'mooc' | 'simple' | 'lovable'
+  kind: 'anthropic' | 'mooc' | 'simple' | 'lovable' | 'openai' | 'essca'
   name: string
   org?: LocaleString
   logo?: string
@@ -183,6 +186,7 @@ const EXPERIENCES_QUERY = `*[_type == "experience"] | order(order asc) {
   "logo": logo{asset->{url}},
   siteUrl,
   "image": image{asset->{url}},
+  status,
   order
 }`
 

@@ -10,10 +10,9 @@ import {
   MapPin,
   Sparkles,
 } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { Button } from "@/components/ui/button";
-import { fetchProfile, pickLocale, type Profile } from "@/lib/sanity";
+import { pickLocale } from "@/lib/sanity";
 import { fallbackProfile } from "@/lib/fallback-content";
 
 const DottedSurface = lazy(() =>
@@ -83,12 +82,8 @@ const socialLabel = (platform: string, url: string) => {
 
 const Hero = () => {
   const { lang } = useLanguage();
-  const { data: profileData } = useQuery<Profile | null>({
-    queryKey: ["profile"],
-    queryFn: fetchProfile,
-  });
-
-  const profile = profileData ?? fallbackProfile;
+  // Sanity est bypassé : le contenu de référence vit dans `fallback-content.ts`.
+  const profile = fallbackProfile;
   const roles = (profile?.roles ?? []).map((r) => pickLocale(r, lang));
   const photoSrc = profile?.photo || "/jean-duthil-photo.jpg";
   const name = profile?.name || "Jean Duthil";
@@ -99,19 +94,19 @@ const Hero = () => {
   const socials = profile?.socials ?? [];
   const signals = [
     {
-      icon: BriefcaseBusiness,
-      label: lang === "fr" ? "Mission actuelle" : "Current mission",
-      value: "Roofwander · Bruxelles",
+      icon: Sparkles,
+      label: lang === "fr" ? "En ce moment" : "Right now",
+      value: lang === "fr" ? "Cléo · 150+ livrets" : "Cléo · 150+ booklets",
     },
     {
-      icon: Sparkles,
-      label: lang === "fr" ? "Recherche" : "Looking for",
-      value: lang === "fr" ? "Alternance · Sept. 2026" : "Internship · Sept. 2026",
+      icon: BriefcaseBusiness,
+      label: lang === "fr" ? "À partir de sept. 2026" : "From Sept. 2026",
+      value: "Betclic · Squad Gen AI",
     },
     {
       icon: MapPin,
-      label: lang === "fr" ? "Base" : "Base",
-      value: "Bordeaux · Marseille · Bruxelles",
+      label: lang === "fr" ? "Base" : "Based in",
+      value: "Bordeaux, France",
     },
   ];
 

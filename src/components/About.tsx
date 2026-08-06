@@ -18,11 +18,8 @@ import {
   Repeat,
   ArrowUpRight,
 } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
 import { useLanguage } from "@/i18n/LanguageContext";
 import {
-  fetchAbout,
-  fetchProfile,
   pickLocale,
   type About as AboutDoc,
   type AboutStat,
@@ -32,16 +29,11 @@ import { fallbackAbout, fallbackProfile } from "@/lib/fallback-content";
 
 const STAT_ICONS = [Target, Zap];
 
-// Real breakdown of each stat — used in the stacked distribution bar
-const STAT_BREAKDOWNS: { label: string; value: number; suffix?: string }[][] = [
-  [
-    { label: "ZEBOAT", value: 200, suffix: "+" },
-    { label: "ADAY BOAT", value: 200, suffix: "+" },
-  ],
-  [
-    { label: "ZEBOAT", value: 19 },
-    { label: "ADAY BOAT", value: 11 },
-  ],
+// Real breakdown of each stat — used in the stacked distribution bar.
+// Only declared where a verified split exists; the bar is skipped otherwise.
+const STAT_BREAKDOWNS: ({ label: string; value: number; suffix?: string }[] | undefined)[] = [
+  undefined,
+  undefined,
 ];
 
 const parseStatValue = (raw: string | undefined): { value: number; suffix: string } => {
@@ -392,8 +384,8 @@ const NowCard = ({
   lang: "fr" | "en";
 }) => {
   const { ref, bindings, style } = useTilt(2);
-  const NOW_HINTS_FR = ["depuis avr.", "depuis 2024"];
-  const NOW_HINTS_EN = ["since Apr", "since 2024"];
+  const NOW_HINTS_FR = ["en cours", "sept. 2026"];
+  const NOW_HINTS_EN = ["ongoing", "Sept. 2026"];
   const hints = lang === "fr" ? NOW_HINTS_FR : NOW_HINTS_EN;
   const items = (about?.nowItems ?? []).map((item, i) => ({
     title: item.title,
@@ -466,17 +458,9 @@ const About = () => {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, amount: 0.15, margin: "0px 0px -40px 0px" });
 
-  const { data: aboutData } = useQuery<AboutDoc | null>({
-    queryKey: ["about"],
-    queryFn: fetchAbout,
-  });
-  const { data: profileData } = useQuery<Profile | null>({
-    queryKey: ["profile"],
-    queryFn: fetchProfile,
-  });
-
-  const about = aboutData ?? fallbackAbout;
-  const profile = profileData ?? fallbackProfile;
+  // Sanity est bypassé : le contenu de référence vit dans `fallback-content.ts`.
+  const about = fallbackAbout;
+  const profile = fallbackProfile;
   const kicker = pickLocale(about?.kicker, lang);
   const headlines = (about?.headlines ?? []).map((h) => pickLocale(h, lang));
   const bio = pickLocale(about?.bio, lang);
@@ -490,8 +474,8 @@ const About = () => {
     },
     {
       icon: Calendar,
-      label: lang === "fr" ? "Disponibilité" : "Availability",
-      value: "Sept. 2026",
+      label: lang === "fr" ? "Alternance" : "Apprenticeship",
+      value: lang === "fr" ? "Betclic · sept. 2026" : "Betclic · Sept. 2026",
     },
     {
       icon: Repeat,

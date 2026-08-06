@@ -23,9 +23,10 @@ const Navbar = () => {
 
   const navLinks = [
     { label: t("nav.about"), href: "#about", id: "about" },
+    { label: t("nav.cleo"), href: "#cleo", id: "cleo" },
     { label: t("nav.experience"), href: "#experience", id: "experience" },
-    { label: t("nav.education"), href: "#education", id: "education" },
     { label: t("nav.skills"), href: "#skills", id: "skills" },
+    { label: t("nav.education"), href: "#education", id: "education" },
     { label: t("nav.contact"), href: "#contact", id: "contact" },
   ];
 
@@ -73,7 +74,7 @@ const Navbar = () => {
       requestAnimationFrame(() => {
         setScrolled(window.scrollY > 24);
 
-        const sections = ["about", "experience", "education", "skills", "contact"];
+        const sections = ["about", "cleo", "experience", "skills", "education", "contact"];
         let current = "";
         for (const id of sections) {
           const el = document.getElementById(id);

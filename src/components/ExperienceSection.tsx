@@ -13,6 +13,8 @@ const categoryOf = (rawType: string): Exclude<FilterId, "all"> => {
   if (
     type.includes("stage") ||
     type.includes("internship") ||
+    type.includes("alternance") ||
+    type.includes("apprenticeship") ||
     type.includes("cdd") ||
     type.includes("fixed-term")
   )
@@ -57,6 +59,7 @@ const fallbackExperiences: SanityExperience[] = localExperiences.map((exp, index
     ...badge,
   })),
   siteUrl: exp.siteUrl,
+  status: exp.status,
   order: index,
 }));
 
@@ -103,7 +106,10 @@ const ExperienceCard = ({
   const localizedDescription = tx("description", exp.description);
 
   const isCurrent =
-    localizedDates.includes("Présent") || localizedDates.includes("Present");
+    exp.status === "current" ||
+    (!exp.status &&
+      (localizedDates.includes("Présent") || localizedDates.includes("Present")));
+  const isUpcoming = exp.status === "upcoming";
 
   const panelId = `exp-panel-${exp._id}`;
   const buttonId = `exp-button-${exp._id}`;
@@ -134,10 +140,12 @@ const ExperienceCard = ({
           : "saas-card-hover"
       }`}
     >
-      {isCurrent && (
+      {(isCurrent || isUpcoming) && (
         <span
           aria-hidden
-          className="absolute left-0 top-4 bottom-4 w-[2px] rounded-full bg-foreground"
+          className={`absolute left-0 top-4 bottom-4 w-[2px] rounded-full ${
+            isCurrent ? "bg-foreground" : "bg-foreground/25"
+          }`}
         />
       )}
 
@@ -161,7 +169,12 @@ const ExperienceCard = ({
               transition={{ type: "spring", stiffness: 300, damping: 22 }}
             />
           ) : (
-            <div className="w-10 h-10 rounded-lg bg-muted border border-border" aria-hidden />
+            <div
+              className="w-10 h-10 rounded-lg bg-secondary border border-border flex items-center justify-center text-sm font-semibold text-foreground/70 select-none"
+              aria-hidden
+            >
+              {exp.company.charAt(0)}
+            </div>
           )}
         </div>
 
@@ -179,6 +192,11 @@ const ExperienceCard = ({
                   >
                     <span className="animate-pulse_dot absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                     <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                  </span>
+                )}
+                {isUpcoming && (
+                  <span className="inline-flex shrink-0 items-center rounded-md border border-border bg-card px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+                    {t("exp.upcoming")}
                   </span>
                 )}
               </div>
@@ -473,8 +491,8 @@ const ExperienceSection = () => {
           </h2>
           <p className="mt-4 text-base text-muted-foreground leading-relaxed">
             {lang === "fr"
-              ? `${experiences.length} expériences, du terrain opérationnel au SaaS IA en production.`
-              : `${experiences.length} entries, from field operations to an AI SaaS in production.`}
+              ? `${experiences.length} expériences, du terrain opérationnel aux produits IA utilisés en vrai.`
+              : `${experiences.length} entries, from field operations to AI products people actually use.`}
           </p>
         </motion.div>
 

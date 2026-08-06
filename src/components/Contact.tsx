@@ -267,7 +267,7 @@ const StatusCard = ({ lang }: { lang: "fr" | "en" }) => {
 
   const rows = [
     { icon: MapPin, label: lang === "fr" ? "Localisation" : "Location", value: "Bordeaux, FR" },
-    { icon: Calendar, label: lang === "fr" ? "Disponibilité" : "Availability", value: "Sept. 2026" },
+    { icon: Calendar, label: lang === "fr" ? "Alternance" : "Apprenticeship", value: "Betclic · 09/2026" },
     { icon: Clock, label: lang === "fr" ? "Heure locale" : "Local time", value: `${time} CET`, live: true },
   ];
 
@@ -290,7 +290,7 @@ const StatusCard = ({ lang }: { lang: "fr" | "en" }) => {
             <span className="animate-pulse_dot absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
             <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
           </span>
-          {lang === "fr" ? "En recherche" : "Open"}
+          {lang === "fr" ? "Dispo pour échanger" : "Open to talk"}
         </div>
       </div>
 
@@ -324,7 +324,7 @@ const StatusCard = ({ lang }: { lang: "fr" | "en" }) => {
       </ul>
 
       <div className="mt-5 pt-4 border-t border-border text-[11px] text-muted-foreground leading-relaxed">
-        {lang === "fr" ? "Rythme alternance" : "Internship rhythm"}:{" "}
+        {lang === "fr" ? "Rythme" : "Rhythm"}:{" "}
         <span className="text-foreground font-medium">
           {lang === "fr" ? "2 sem. entreprise · 1 sem. école" : "2 weeks company · 1 week school"}
         </span>
@@ -593,13 +593,11 @@ const Contact = () => {
 
   const mailto = (() => {
     const subject =
-      lang === "fr"
-        ? "Opportunité d'alternance — Septembre 2026"
-        : "Internship opportunity — September 2026";
+      lang === "fr" ? "Échange — via ton portfolio" : "Getting in touch — via your portfolio";
     const body =
       lang === "fr"
-        ? `Salut Jean,\n\nJe te contacte concernant une opportunité d'alternance chez [ENTREPRISE] à partir de septembre 2026.\n\nPoste : [INTITULÉ]\nRythme : 2 semaines entreprise / 1 semaine école\nLieu : [LOCALISATION]\n\nQuelques mots sur le contexte :\n[...]\n\nTu serais dispo pour un échange cette semaine ?\n\nÀ bientôt,\n[NOM]`
-        : `Hi Jean,\n\nI'm reaching out about an internship opportunity at [COMPANY] starting in September 2026.\n\nRole: [TITLE]\nRhythm: 2 weeks in company / 1 week at school\nLocation: [LOCATION]\n\nA few words about the context:\n[...]\n\nWould you be available for a quick call this week?\n\nBest,\n[NAME]`;
+        ? `Salut Jean,\n\nJe te contacte à propos de [SUJET].\n\nContexte :\n[...]\n\nCe que j'ai en tête :\n[...]\n\nTu serais dispo pour un échange cette semaine ?\n\nÀ bientôt,\n[NOM]`
+        : `Hi Jean,\n\nI'm reaching out about [TOPIC].\n\nContext:\n[...]\n\nWhat I have in mind:\n[...]\n\nWould you be available for a quick call this week?\n\nBest,\n[NAME]`;
     return `mailto:${EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   })();
 
@@ -623,18 +621,18 @@ const Contact = () => {
                 <span className="animate-pulse_dot absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                 <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
               </span>
-              {lang === "fr" ? "Dispo dès sept. 2026" : "Available Sept. 2026"}
+              {lang === "fr" ? "Boîte mail ouverte" : "Inbox open"}
             </div>
             <h2 className="text-3xl md:text-5xl font-semibold tracking-[-0.035em] leading-[1.05] text-foreground">
-              {lang === "fr" ? "On travaille ensemble ?" : "Shall we work together?"}
+              {lang === "fr" ? "Parlons produit, IA ou business." : "Let's talk product, AI or business."}
             </h2>
             <p
               className="mt-4 text-base md:text-lg text-muted-foreground leading-relaxed"
               style={{ textWrap: "balance" } as React.CSSProperties}
             >
               {lang === "fr"
-                ? "Alternance Business Dev, Product ou IA appliquée — 2 semaines entreprise / 1 semaine école. Toujours partant pour un café ou un appel."
-                : "Business Dev, Product or Applied AI internship — 2 weeks in company / 1 week at school. Always open to coffee or a call."}
+                ? "Je rejoins la Squad Gen AI Transformation de Betclic en septembre 2026. D'ici là je continue de construire — écris-moi si tu veux en parler."
+                : "I join Betclic's Gen AI Transformation squad in September 2026. Until then I keep building — write to me if you want to talk."}
             </p>
           </div>
           <div className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">

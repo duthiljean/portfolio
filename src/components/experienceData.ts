@@ -1,11 +1,12 @@
 import addetectiveLogo from "@/assets/addetective-logo.svg";
+import betclicLogo from "@/assets/betclic-logo.png";
+import cleoLogo from "@/assets/cleo-logo.png";
 import roofwanderLogo from "@/assets/roofwander-logo.webp";
 import adayBoatLogo from "@/assets/aday-boat-logo.jpeg";
 import zeboatLogo from "@/assets/zeboat-logo.jpeg";
 import bdeLogo from "@/assets/bde-esscalibur-logo.jpeg";
 import mapetitecoquilleLogo from "@/assets/mapetitecoquille-logo.png";
 import mapetitecoquilleCollection from "@/assets/mapetitecoquille-collection.webp";
-import ministereArmeesLogo from "@/assets/ministere-armees-logo.jpeg";
 
 export interface BadgeItem {
   label: string;
@@ -24,18 +25,52 @@ export interface Experience {
   logo?: string;
   siteUrl?: string;
   image?: string;
+  /** "upcoming" = signé mais pas commencé · "current" = en cours */
+  status?: "upcoming" | "current";
 }
 
 export const experiences: Experience[] = [
+  {
+    i18nKey: "betclic",
+    title: "Alternant — Squad Gen AI Transformation",
+    company: "Betclic",
+    type: "Alternance",
+    dates: "Septembre 2026 →",
+    location: "Bordeaux, France",
+    status: "upcoming",
+    description:
+      "Alternance de 3e année dans la squad qui pilote l'adoption de l'IA générative dans le groupe. Ce que je vais y faire :\n→ Identifier et cadrer les cas d'usage Gen AI avec les équipes métier\n→ Automatiser des workflows et tester des agents en conditions réelles\n→ Accompagner les équipes et diffuser les bonnes pratiques\n→ Mesurer l'adoption et l'impact réel des outils déployés",
+    badges: [{ label: "Gen AI" }, { label: "Adoption & change" }, { label: "Automatisation" }],
+    logo: betclicLogo,
+    siteUrl: "https://www.betclicgroup.com",
+  },
+  {
+    i18nKey: "cleo",
+    title: "Fondateur — Cléo",
+    company: "Cléo",
+    type: "Projet entrepreneurial",
+    dates: "Juin 2026 — Présent",
+    location: "Marseille, France",
+    status: "current",
+    description:
+      "Livrets d'accueil numériques pour hôtes Airbnb, gîtes et conciergeries. Produit, code, infra et support en solo.\n→ 150+ livrets créés depuis le lancement, 4,4/5 sur Trustpilot\n→ Génération depuis une annonce : scraping Apify, mapping déterministe, puis LLM contraint à citer un extrait exact de la source\n→ Vérification serveur de chaque consigne générée — sans preuve dans l'annonce, l'info est jetée\n→ Assistant voyageur multilingue, partage par lien ou QR code, sans application\n→ 29 € à vie par livret, 69 € clé en main, sur-mesure pour les conciergeries",
+    badges: [
+      { label: "150+ livrets" },
+      { label: "4,4/5 Trustpilot" },
+      { label: "Produit solo" },
+    ],
+    logo: cleoLogo,
+    siteUrl: "https://monlivretcleo.fr",
+  },
   {
     i18nKey: "roofwander",
     title: "Business Developer & Partnerships",
     company: "Roofwander",
     type: "Stage",
-    dates: "Mars 2026 — Présent",
+    dates: "Mars — Août 2026",
     location: "Bruxelles, Belgique",
     description:
-      "Marketplace de location de tentes de toit entre particuliers et professionnels.\n→ Prospection et closing de partenariats avec revendeurs et marques outdoor\n→ Acquisition et onboarding de propriétaires sur la plateforme\n→ Structuration des process commerciaux et du CRM\n→ Automatisations IA (Claude, Cursor) pour qualifier les leads et accélérer les opérations",
+      "Marketplace de location de tentes de toit entre particuliers et professionnels.\n→ Prospection et closing de partenariats avec revendeurs et marques outdoor\n→ Acquisition et onboarding de propriétaires sur la plateforme\n→ Structuration des process commerciaux et du CRM\n→ Automatisations IA pour qualifier les leads et accélérer les opérations",
     badges: [{ label: "Partenariats B2B" }, { label: "Growth & SEO" }, { label: "Automatisations IA" }],
     logo: roofwanderLogo,
     siteUrl: "https://roofwander.com/fr",
@@ -45,10 +80,10 @@ export const experiences: Experience[] = [
     title: "Fondateur — SaaS IA",
     company: "AdDetective",
     type: "Projet entrepreneurial",
-    dates: "Janvier 2026 — Présent",
+    dates: "Janvier — Juin 2026",
     location: "Marseille, France",
     description:
-      "SaaS d'analyse d'annonces immobilières et véhicules par IA, conçu et développé en solo.\n→ Analyse texte + photos, score de risque, points de vigilance et marge de négociation en 30s\n→ Stack : React/Vite, Supabase, Stripe, LLMs (Claude, GPT)\n→ Développé intégralement avec Cursor et Claude Code, du prototype à la production",
+      "SaaS d'analyse d'annonces immobilières et véhicules par IA, conçu et développé en solo.\n→ Analyse texte + photos, score de risque et marge de négociation estimée en 30s\n→ Stack : React/Vite, Supabase, Stripe, LLMs (Claude, GPT)\n→ Premier produit mené de l'idée à la mise en production",
     badges: [{ label: "Produit solo" }, { label: "SaaS IA" }, { label: "Idée → Prod" }],
     logo: addetectiveLogo,
     siteUrl: "https://addetective.fr",
@@ -103,17 +138,5 @@ export const experiences: Experience[] = [
     badges: [{ label: "Entrepreneuriat" }, { label: "E-commerce" }, { label: "Branding" }],
     logo: mapetitecoquilleLogo,
     image: mapetitecoquilleCollection,
-  },
-  {
-    i18nKey: "armees",
-    title: "Stagiaire découverte",
-    company: "Ministère des Armées",
-    type: "Stage",
-    dates: "Février — Mars 2021",
-    location: "Toulon, France",
-    description:
-      "→ Immersion en base aéronavale : services techniques, unités spécialisées\n→ Échanges avec le personnel civil et militaire sur les métiers de la Défense",
-    badges: [{ label: "Défense" }, { label: "Stage découverte" }],
-    logo: ministereArmeesLogo,
   },
 ];

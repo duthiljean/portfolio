@@ -6,9 +6,9 @@ import {
   MotionValue,
   useReducedMotion,
 } from "framer-motion";
-import { ArrowUpRight, Lock } from "lucide-react";
-import addetectiveScreenshot from "@/assets/addetective-screenshot.webp";
-import addetectiveLogo from "@/assets/addetective-logo.svg";
+import { ArrowUpRight, Lock, Link2, Braces, Quote, ShieldCheck } from "lucide-react";
+import cleoScreenshot from "@/assets/cleo-screenshot.jpg";
+import cleoLogo from "@/assets/cleo-logo.png";
 import { useLanguage } from "@/i18n/LanguageContext";
 
 /* ─────────── Browser chrome frame ─────────── */
@@ -26,7 +26,7 @@ const BrowserFrame = ({ children }: { children: React.ReactNode }) => (
       <div className="flex-1 flex justify-center">
         <div className="inline-flex items-center gap-1.5 rounded-md bg-secondary border border-border px-2 py-0.5 md:py-1 text-[10px] md:text-[11px] font-medium text-muted-foreground">
           <Lock size={9} strokeWidth={2.4} />
-          <span className="tabular-nums">addetective.fr</span>
+          <span className="tabular-nums">monlivretcleo.fr</span>
         </div>
       </div>
       <div className="w-[38px]" aria-hidden />
@@ -97,27 +97,97 @@ const ShowcaseCard = ({
   </motion.div>
 );
 
+/* ─────────── Generation pipeline ─────────── */
+const PipelineStep = ({
+  icon: Icon,
+  step,
+  title,
+  detail,
+  index,
+}: {
+  icon: typeof Link2;
+  step: string;
+  title: string;
+  detail: string;
+  index: number;
+}) => (
+  <motion.li
+    initial={{ opacity: 0, y: 10 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true, amount: 0.4 }}
+    transition={{ duration: 0.4, delay: index * 0.07, ease: [0.16, 1, 0.3, 1] }}
+    className="group relative bg-card p-5 md:p-6 transition-colors duration-300 hover:bg-muted/40"
+  >
+    <div className="flex items-center justify-between gap-2">
+      <div className="h-8 w-8 rounded-lg bg-secondary flex items-center justify-center transition-colors group-hover:bg-foreground group-hover:text-background">
+        <Icon size={14} strokeWidth={2} />
+      </div>
+      <span className="text-[10px] font-semibold tabular-nums uppercase tracking-wider text-muted-foreground">
+        {step}
+      </span>
+    </div>
+    <div className="mt-4 text-sm font-semibold text-foreground leading-tight tracking-[-0.01em]">
+      {title}
+    </div>
+    <p
+      className="mt-1.5 text-xs text-muted-foreground leading-relaxed"
+      style={{ textWrap: "pretty" } as React.CSSProperties}
+    >
+      {detail}
+    </p>
+  </motion.li>
+);
+
 /* ─────────── Main section ─────────── */
-const AddetectiveShowcase = () => {
+const CleoShowcase = () => {
   const { lang } = useLanguage();
+  const fr = lang === "fr";
+
   const metrics = [
+    { label: fr ? "Livrets créés" : "Booklets created", value: "150+" },
+    { label: "Trustpilot", value: fr ? "4,4/5" : "4.4/5" },
+    { label: fr ? "Accès voyageur" : "Guest access", value: fr ? "Lien ou QR" : "Link or QR" },
+    { label: fr ? "Publication" : "Publishing", value: fr ? "29 € à vie" : "€29 lifetime" },
+  ];
+
+  const pipeline = [
     {
-      label: lang === "fr" ? "Analyse" : "Analysis",
-      value: "30s",
+      icon: Link2,
+      step: "01",
+      title: fr ? "L'annonce" : "The listing",
+      detail: fr
+        ? "L'hôte colle son URL Airbnb, Booking ou Abritel. Récupération de la page via Apify."
+        : "The host pastes an Airbnb, Booking or Abritel URL. The page is fetched through Apify.",
     },
     {
-      label: lang === "fr" ? "Entrées" : "Inputs",
-      value: lang === "fr" ? "Texte + photos" : "Text + photos",
+      icon: Braces,
+      step: "02",
+      title: fr ? "Mapping déterministe" : "Deterministic mapping",
+      detail: fr
+        ? "Photos, équipements, horaires et règles sont extraits par des règles, sans modèle. Pas d'IA là où du code suffit."
+        : "Photos, amenities, hours and rules are extracted by rules, no model involved. No AI where plain code does the job.",
     },
     {
-      label: lang === "fr" ? "Sortie" : "Output",
-      value: lang === "fr" ? "Score + négo" : "Score + deal room",
+      icon: Quote,
+      step: "03",
+      title: fr ? "LLM sous contrainte" : "Constrained LLM",
+      detail: fr
+        ? "Le modèle rédige les consignes, mais chaque phrase doit être accompagnée d'un extrait exact de l'annonce source."
+        : "The model writes the instructions, but every sentence must carry an exact excerpt from the source listing.",
+    },
+    {
+      icon: ShieldCheck,
+      step: "04",
+      title: fr ? "Vérification serveur" : "Server-side check",
+      detail: fr
+        ? "Le serveur recherche l'extrait dans la source. Introuvable ? La consigne est jetée, pas publiée."
+        : "The server looks the excerpt up in the source. Not found? The instruction is dropped, never published.",
     },
   ];
 
   return (
     <section
-      id="addetective-showcase"
+      id="cleo"
       className="relative py-16 sm:py-20 md:py-28 px-5 md:px-8 border-t border-border overflow-hidden"
     >
       {/* Subtle dot-grid backdrop */}
@@ -149,7 +219,7 @@ const AddetectiveShowcase = () => {
               <span className="animate-pulse_dot absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
               <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
             </span>
-            {lang === "fr" ? "PROJET VEDETTE · EN PRODUCTION" : "FEATURED PROJECT · LIVE"}
+            {fr ? "PRODUIT EN LIGNE · UTILISÉ EN VRAI" : "LIVE PRODUCT · REAL USERS"}
           </motion.div>
 
           <motion.div
@@ -160,12 +230,12 @@ const AddetectiveShowcase = () => {
             className="flex items-center justify-center gap-3"
           >
             <img
-              src={addetectiveLogo}
+              src={cleoLogo}
               alt=""
-              className="h-11 w-11 md:h-14 md:w-14 rounded-xl border border-border bg-card p-1.5 shadow-sm"
+              className="h-11 w-11 md:h-14 md:w-14 rounded-xl border border-border bg-card p-1.5 shadow-sm object-contain"
             />
             <h2 className="text-3xl md:text-5xl font-semibold tracking-[-0.035em] leading-[1.05] text-foreground">
-              addetective
+              Cléo
             </h2>
           </motion.div>
 
@@ -177,9 +247,9 @@ const AddetectiveShowcase = () => {
             className="mt-4 max-w-xl mx-auto text-base md:text-lg text-muted-foreground leading-relaxed"
             style={{ textWrap: "balance" } as React.CSSProperties}
           >
-            {lang === "fr"
-              ? "L'IA qui analyse n'importe quelle annonce en 30 secondes — points de vigilance, incohérences et marge de négociation estimée."
-              : "AI that reviews any listing in 30 seconds — red flags, inconsistencies and estimated negotiation margin."}
+            {fr
+              ? "Le livret d'accueil numérique des hôtes et des conciergeries. On colle une annonce, le livret se remplit — sans qu'un modèle invente un code d'accès."
+              : "The digital welcome book for hosts and property managers. Paste a listing, the booklet fills itself — without a model inventing a door code."}
           </motion.p>
         </div>
 
@@ -188,8 +258,12 @@ const AddetectiveShowcase = () => {
           <ContainerScroll>
             <BrowserFrame>
               <img
-                src={addetectiveScreenshot}
-                alt="Interface addetective — page d'accueil"
+                src={cleoScreenshot}
+                alt={
+                  fr
+                    ? "Page d'accueil de Cléo avec l'aperçu d'un livret côté voyageur"
+                    : "Cléo landing page with a guest-facing booklet preview"
+                }
                 className="h-full w-full object-cover object-top"
                 draggable={false}
               />
@@ -197,18 +271,16 @@ const AddetectiveShowcase = () => {
           </ContainerScroll>
         </div>
 
+        {/* Metrics */}
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.4, delay: 0.08 }}
-          className="mt-8 md:mt-10 grid grid-cols-1 sm:grid-cols-3 gap-px overflow-hidden rounded-2xl border border-border bg-border max-w-4xl mx-auto"
+          className="mt-8 md:mt-10 grid grid-cols-2 lg:grid-cols-4 gap-px overflow-hidden rounded-2xl border border-border bg-border max-w-4xl mx-auto"
         >
           {metrics.map((metric) => (
-            <div
-              key={metric.label}
-              className="bg-card px-4 py-4 text-center sm:text-left"
-            >
+            <div key={metric.label} className="bg-card px-4 py-4 text-center sm:text-left">
               <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
                 {metric.label}
               </div>
@@ -219,18 +291,62 @@ const AddetectiveShowcase = () => {
           ))}
         </motion.div>
 
+        {/* Generation pipeline — the interesting part */}
+        <div className="mt-14 md:mt-20 max-w-5xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            className="max-w-2xl"
+          >
+            <div className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-2.5 py-1 text-[11px] font-medium text-muted-foreground mb-5">
+              <span className="h-1 w-1 rounded-full bg-foreground/60" />
+              {fr ? "Sous le capot" : "Under the hood"}
+            </div>
+            <h3 className="text-2xl md:text-[2rem] font-semibold tracking-[-0.03em] leading-[1.1] text-foreground">
+              {fr
+                ? "Un livret ne peut pas inventer un code d'accès."
+                : "A booklet cannot invent a door code."}
+            </h3>
+            <p className="mt-4 text-base text-muted-foreground leading-relaxed">
+              {fr
+                ? "Un hôte qui publie une consigne fausse, c'est un voyageur bloqué devant une porte à 23h. La génération est donc construite pour refuser d'écrire ce qu'elle ne peut pas prouver."
+                : "A wrong instruction means a guest stuck outside at 11pm. So the generation pipeline is built to refuse anything it cannot prove."}
+            </p>
+          </motion.div>
+
+          <ol className="mt-8 md:mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px overflow-hidden rounded-2xl border border-border bg-border">
+            {pipeline.map((s, i) => (
+              <PipelineStep key={s.step} {...s} index={i} />
+            ))}
+          </ol>
+
+          <motion.p
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.4, delay: 0.2 }}
+            className="mt-4 text-[13px] text-muted-foreground leading-relaxed"
+          >
+            {fr
+              ? "Côté voyageur, un assistant répond aux questions à partir du seul contenu du livret, avec un routage d'intention multilingue — pas d'embeddings, inutiles à cette échelle."
+              : "On the guest side, an assistant answers questions from the booklet content only, with multilingual intent routing — no embeddings, they earn nothing at this scale."}
+          </motion.p>
+        </div>
+
         {/* Stack + CTA */}
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.4, delay: 0.1 }}
-          className="mt-7 md:mt-8 flex flex-wrap items-center justify-center gap-2"
+          className="mt-10 md:mt-12 flex flex-wrap items-center justify-center gap-2"
         >
           <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mr-1">
             Stack
           </span>
-          {["React", "TypeScript", "Supabase", "Tailwind", "Firecrawl"].map((chip) => (
+          {["React", "TypeScript", "Supabase", "Stripe", "Apify", "Claude"].map((chip) => (
             <span
               key={chip}
               className="inline-flex items-center gap-1 rounded-full border border-border bg-card px-2.5 py-1 text-xs font-medium text-foreground"
@@ -239,12 +355,12 @@ const AddetectiveShowcase = () => {
             </span>
           ))}
           <a
-            href="https://addetective.fr/"
+            href="https://monlivretcleo.fr"
             target="_blank"
             rel="noopener noreferrer"
             className="group inline-flex items-center gap-1.5 rounded-full bg-foreground px-3 py-1 text-xs font-medium text-background hover:bg-foreground/90 transition-colors ml-1"
           >
-            {lang === "fr" ? "Voir le site" : "Visit site"}
+            {fr ? "Voir le site" : "Visit site"}
             <ArrowUpRight
               size={12}
               strokeWidth={2.2}
@@ -257,4 +373,4 @@ const AddetectiveShowcase = () => {
   );
 };
 
-export default AddetectiveShowcase;
+export default CleoShowcase;

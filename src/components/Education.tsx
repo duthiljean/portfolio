@@ -10,9 +10,11 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import esscaLogo from "@/assets/essca-logo.jpeg";
 import moocCert from "@/assets/mooc-creative-box-cert.webp";
+import climateCert from "@/assets/essca-climate-cert.jpg";
 import anthropicLogo from "@/assets/anthropic-logo.png";
 import competencesMetiersLogo from "@/assets/competences-metiers-logo.jpeg";
 import lovableLogo from "@/assets/lovable-logo.jpeg";
+import chatgptLogo from "@/assets/chatgpt-logo.png";
 import { useLanguage } from "@/i18n/LanguageContext";
 import {
   pickLocale,
@@ -61,6 +63,8 @@ const LOVABLE_TIERS: { name: string; level: number; desc: { fr: string; en: stri
 const FALLBACK_LOGOS: Record<string, string> = {
   anthropic: anthropicLogo,
   mooc: esscaLogo,
+  essca: esscaLogo,
+  openai: chatgptLogo,
   simple: competencesMetiersLogo,
   lovable: lovableLogo,
 };
@@ -183,6 +187,7 @@ const DegreeCard = ({
   const name = pickLocale(degree.name, lang);
   const durationLabel = pickLocale(degree.durationLabel, lang);
   const bdeLabel = pickLocale(degree.bdeLabel, lang);
+  const apprenticeshipLabel = pickLocale(degree.apprenticeshipLabel, lang);
   const logoSrc = degree.schoolLogo || esscaLogo;
 
   return (
@@ -255,6 +260,12 @@ const DegreeCard = ({
       </div>
 
       <div className="relative mt-6 flex flex-wrap items-center gap-2">
+        {apprenticeshipLabel && (
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-foreground/20 bg-foreground/[0.04] px-2.5 py-1 text-[11px] font-medium text-foreground">
+            <GraduationCap size={11} className="text-foreground" />
+            {apprenticeshipLabel}
+          </span>
+        )}
         {bdeLabel && (
           <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-2.5 py-1 text-[11px] font-medium text-foreground transition-colors group-hover:border-foreground/20">
             <Award size={11} className="text-foreground" />
@@ -287,7 +298,8 @@ const CertCard = ({
   const { ref, onPointerMove } = useSpotlight<HTMLDivElement>();
 
   const logoSrc = cert.logo || FALLBACK_LOGOS[cert.kind];
-  const expandable = cert.kind === "anthropic" || cert.kind === "mooc";
+  const expandable =
+    cert.kind === "anthropic" || cert.kind === "mooc" || cert.kind === "essca";
   const subCertsCount = cert.subCerts?.length ?? 0;
 
   const panelId = `cert-panel-${cert._key ?? index}`;
@@ -445,7 +457,7 @@ const CertCard = ({
                 </div>
               )}
 
-              {cert.kind === "mooc" && (
+              {(cert.kind === "mooc" || cert.kind === "essca") && (
                 <motion.div
                   initial={{ opacity: 0, y: 6 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -453,8 +465,11 @@ const CertCard = ({
                   className="overflow-hidden rounded-lg border border-border"
                 >
                   <img
-                    src={cert.certImage || moocCert}
-                    alt="Certificate"
+                    src={
+                      cert.certImage ??
+                      (cert.kind === "essca" ? climateCert : moocCert)
+                    }
+                    alt={cert.name}
                     loading="lazy"
                     className="w-full block transition-transform duration-500 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] hover:scale-[1.02]"
                   />
@@ -593,9 +608,8 @@ const Education = () => {
                 {certsLabel}
               </h3>
               <span className="text-[11px] text-muted-foreground tabular-nums">
-                {certifications.length} ·{" "}
                 {certifications.reduce((acc, c) => acc + (c.subCerts?.length ?? 1), 0)}{" "}
-                {lang === "fr" ? "programmes" : "programs"}
+                {lang === "fr" ? "certifications" : "certifications"}
               </span>
             </motion.div>
 

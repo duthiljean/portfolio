@@ -16,70 +16,63 @@ interface LanguageContextType {
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
+/**
+ * Seules les chaînes réellement consommées via `t()` vivent ici.
+ * Le contenu des sections Hero / About / Skills / Education est bilingue
+ * dans `src/lib/fallback-content.ts` — ne pas le dupliquer ici.
+ */
 const translations: Record<Lang, Record<string, string>> = {
   fr: {
     // Navbar
     "nav.about": "À propos",
+    "nav.cleo": "Cléo",
     "nav.experience": "Expériences",
     "nav.education": "Formation",
     "nav.skills": "Compétences",
     "nav.contact": "Contact",
 
-    // Hero
-    "hero.badge": "Recherche alternance — Septembre 2026",
-    "hero.dateline": "Marseille · Bordeaux · Bruxelles · ’26",
-    "hero.cta1": "Voir mon parcours",
-    "hero.cta2": "Me contacter",
-    "hero.role1": "Builder IA",
-    "hero.role2": "Business Developer",
-    "hero.role3": "Product Thinker",
-
-    // About
-    "about.title": "À propos",
-    "about.kicker": "À PROPOS",
-    "about.dateline": "BORDEAUX — BRUXELLES — 2026",
-    "about.headline1": "Construire des produits.",
-    "about.headline2": "Développer des activités.",
-    "about.headline3": "Avec l'IA comme levier.",
-    "about.bio":
-      "Actuellement en stage chez Roofwander à Bruxelles, j'ai aussi lancé AdDetective — un SaaS d'analyse d'annonces propulsé par l'IA. De la prospection à la mise en production.",
-    "about.description":
-      "Je conçois des produits et développe des activités en utilisant l'IA comme levier — de la prospection à la mise en production. Actuellement en stage chez Roofwander, j'ai aussi lancé AdDetective, un SaaS d'analyse d'annonces propulsé par l'IA.",
-    "about.location": "Bordeaux, France",
-    "about.phone": "07 60 04 90 11",
-    "about.rhythm": "Rythme : 2 sem. entreprise / 1 sem. école",
-    "about.languages": "Français (natif) · Anglais (B2) · Espagnol (B1)",
-    "about.stat1": "locations gérées",
-    "about.stat2": "bateaux gérés",
-    "about.stat3": "produits construits avec l'IA",
-    "about.now_label": "EN CE MOMENT",
-    "about.now_1_title": "Roofwander",
-    "about.now_1_desc": "Business Dev · Bruxelles",
-    "about.now_2_title": "AdDetective",
-    "about.now_2_desc": "SaaS IA · solo",
-
-    // Experience
+    // Experience — chrome
     "exp.title": "Expériences",
     "exp.current": "En cours",
-    "exp.entries_label": "ENTRÉES",
+    "exp.upcoming": "À venir",
 
-    // Experience entries
+    // Experience — entries
+    "exp.betclic.title": "Alternant — Squad Gen AI Transformation",
+    "exp.betclic.type": "Alternance",
+    "exp.betclic.dates": "Septembre 2026 →",
+    "exp.betclic.location": "Bordeaux, France",
+    "exp.betclic.description":
+      "Alternance de 3e année dans la squad qui pilote l'adoption de l'IA générative dans le groupe. Ce que je vais y faire :\n→ Identifier et cadrer les cas d'usage Gen AI avec les équipes métier\n→ Automatiser des workflows et tester des agents en conditions réelles\n→ Accompagner les équipes et diffuser les bonnes pratiques\n→ Mesurer l'adoption et l'impact réel des outils déployés",
+    "exp.betclic.badge1": "Gen AI",
+    "exp.betclic.badge2": "Adoption & change",
+    "exp.betclic.badge3": "Automatisation",
+
+    "exp.cleo.title": "Fondateur — Cléo",
+    "exp.cleo.type": "Projet entrepreneurial",
+    "exp.cleo.dates": "Juin 2026 — Présent",
+    "exp.cleo.location": "Marseille, France",
+    "exp.cleo.description":
+      "Livrets d'accueil numériques pour hôtes Airbnb, gîtes et conciergeries. Produit, code, infra et support en solo.\n→ 150+ livrets créés depuis le lancement, 4,4/5 sur Trustpilot\n→ Génération depuis une annonce : scraping Apify, mapping déterministe, puis LLM contraint à citer un extrait exact de la source\n→ Vérification serveur de chaque consigne générée — sans preuve dans l'annonce, l'info est jetée\n→ Assistant voyageur multilingue, partage par lien ou QR code, sans application\n→ 29 € à vie par livret, 69 € clé en main, sur-mesure pour les conciergeries",
+    "exp.cleo.badge1": "150+ livrets",
+    "exp.cleo.badge2": "4,4/5 Trustpilot",
+    "exp.cleo.badge3": "Produit solo",
+
     "exp.roofwander.title": "Business Developer & Partnerships",
     "exp.roofwander.type": "Stage",
-    "exp.roofwander.dates": "Mars 2026 — Présent",
+    "exp.roofwander.dates": "Mars — Août 2026",
     "exp.roofwander.location": "Bruxelles, Belgique",
     "exp.roofwander.description":
-      "Marketplace de location de tentes de toit entre particuliers et professionnels.\n→ Prospection et closing de partenariats avec revendeurs et marques outdoor\n→ Acquisition et onboarding de propriétaires sur la plateforme\n→ Structuration des process commerciaux et du CRM\n→ Automatisations IA (Claude, Cursor) pour qualifier les leads et accélérer les opérations",
+      "Marketplace de location de tentes de toit entre particuliers et professionnels.\n→ Prospection et closing de partenariats avec revendeurs et marques outdoor\n→ Acquisition et onboarding de propriétaires sur la plateforme\n→ Structuration des process commerciaux et du CRM\n→ Automatisations IA pour qualifier les leads et accélérer les opérations",
     "exp.roofwander.badge1": "Partenariats B2B",
     "exp.roofwander.badge2": "Growth & SEO",
     "exp.roofwander.badge3": "Automatisations IA",
 
     "exp.addetective.title": "Fondateur — SaaS IA",
     "exp.addetective.type": "Projet entrepreneurial",
-    "exp.addetective.dates": "Janvier 2026 — Présent",
+    "exp.addetective.dates": "Janvier — Juin 2026",
     "exp.addetective.location": "Marseille, France",
     "exp.addetective.description":
-      "SaaS d'analyse d'annonces immobilières et véhicules par IA, conçu et développé en solo.\n→ Analyse texte + photos, score de risque, points de vigilance et marge de négociation en 30s\n→ Stack : React/Vite, Supabase, Stripe, LLMs (Claude, GPT)\n→ Développé intégralement avec Cursor et Claude Code, du prototype à la production",
+      "SaaS d'analyse d'annonces immobilières et véhicules par IA, conçu et développé en solo.\n→ Analyse texte + photos, score de risque et marge de négociation estimée en 30s\n→ Stack : React/Vite, Supabase, Stripe, LLMs (Claude, GPT)\n→ Premier produit mené de l'idée à la mise en production",
     "exp.addetective.badge1": "Produit solo",
     "exp.addetective.badge2": "SaaS IA",
     "exp.addetective.badge3": "Idée → Prod",
@@ -123,48 +116,7 @@ const translations: Record<Lang, Record<string, string>> = {
     "exp.coquille.badge2": "E-commerce",
     "exp.coquille.badge3": "Branding",
 
-    "exp.armees.title": "Stagiaire découverte",
-    "exp.armees.type": "Stage",
-    "exp.armees.dates": "Février — Mars 2021",
-    "exp.armees.location": "Toulon, France",
-    "exp.armees.description":
-      "→ Immersion en base aéronavale : services techniques, unités spécialisées\n→ Échanges avec le personnel civil et militaire sur les métiers de la Défense",
-    "exp.armees.badge1": "Défense",
-    "exp.armees.badge2": "Stage découverte",
-
-    // Education
-    "edu.title": "Formation",
-    "edu.dateline": "1 DIPLÔME · 3 CERTIFICATIONS",
-    "edu.degree_kicker": "BACHELOR · INTERNATIONAL BUSINESS",
-    "edu.degree": "Bachelor en Management International — International Business",
-    "edu.dates": "2024 — 2027",
-    "edu.bde": "VP du Bureau Des Étudiants",
-    "edu.certs": "Certifications",
-    "edu.anthropic.count": "3 certifications · 2025",
-    "edu.mooc.org": "ESSCA · 2025",
-    "edu.ai.org": "Compétences et Métiers · 2024",
-
-    // Skills
-    "skills.title": "Ce que je sais faire.",
-    "skills.kicker": "COMPÉTENCES",
-    "skills.dateline": "3 AXES · USAGE QUOTIDIEN",
-    "skills.subtitle": "Construire, développer et optimiser des produits en utilisant l'IA comme levier.",
-    "skills.cat1.title": "Construire avec l'IA",
-    "skills.cat1.desc": "Outils maîtrisés au quotidien pour concevoir et expédier.",
-    "skills.cat2.title": "Développer le business",
-    "skills.cat2.desc": "Acquisition, croissance et partenariats opérationnels.",
-    "skills.cat3.title": "Concevoir le produit",
-    "skills.cat3.desc": "Du cadrage stratégique à la mise en production.",
-    "skills.legend": "Usage quotidien",
-    "skills.tooltip.daily": "Usage quotidien",
-    "skills.tooltip.project": "Appliqué en projet",
-    "skills.tooltip.operational": "Expérience opérationnelle",
-    "skills.pill.saas": "Développement SaaS",
-
     // Contact
-    "contact.title": "Envie de travailler ensemble ?",
-    "contact.subtitle": "Je cherche une alternance à partir de septembre 2026 en Business Dev, Product ou IA appliquée.",
-    "contact.download": "Télécharger CV (PDF)",
     "contact.toast.emailCopied": "Email copié",
     "contact.toast.emailCopiedDesc": "Collé dans le presse-papiers.",
     "contact.toast.copyFailed": "Copie impossible",
@@ -179,70 +131,60 @@ const translations: Record<Lang, Record<string, string>> = {
     "contact.cv.pick": "Choisir la langue",
     "contact.cv.fr": "Version française",
     "contact.cv.en": "English version",
+
     "footer.made": "Construit avec l'IA",
   },
   en: {
     // Navbar
     "nav.about": "About",
+    "nav.cleo": "Cléo",
     "nav.experience": "Experience",
     "nav.education": "Education",
     "nav.skills": "Skills",
     "nav.contact": "Contact",
 
-    // Hero
-    "hero.badge": "Looking for an internship — September 2026",
-    "hero.dateline": "Marseille · Bordeaux · Brussels · ’26",
-    "hero.cta1": "View my background",
-    "hero.cta2": "Contact me",
-    "hero.role1": "AI Builder",
-    "hero.role2": "Business Developer",
-    "hero.role3": "Product Thinker",
-
-    // About
-    "about.title": "About",
-    "about.kicker": "ABOUT",
-    "about.dateline": "BORDEAUX — BRUSSELS — 2026",
-    "about.headline1": "Build products.",
-    "about.headline2": "Grow businesses.",
-    "about.headline3": "With AI as the lever.",
-    "about.bio":
-      "Currently interning at Roofwander in Brussels, I also launched AdDetective — an AI-powered listing analysis SaaS. From prospecting to production.",
-    "about.description":
-      "I build products and grow businesses using AI as a lever — from prospecting to production. Currently interning at Roofwander, I also launched AdDetective, an AI-powered listing analysis SaaS.",
-    "about.location": "Bordeaux, France",
-    "about.phone": "07 60 04 90 11",
-    "about.rhythm": "Schedule: 2 weeks company / 1 week school",
-    "about.languages": "French (native) · English (B2) · Spanish (B1)",
-    "about.stat1": "rentals managed",
-    "about.stat2": "boats managed",
-    "about.stat3": "products built with AI",
-    "about.now_label": "CURRENTLY",
-    "about.now_1_title": "Roofwander",
-    "about.now_1_desc": "Business Dev · Brussels",
-    "about.now_2_title": "AdDetective",
-    "about.now_2_desc": "AI SaaS · solo",
-
-    // Experience
+    // Experience — chrome
     "exp.title": "Experience",
     "exp.current": "Current",
-    "exp.entries_label": "ENTRIES",
+    "exp.upcoming": "Upcoming",
+
+    // Experience — entries
+    "exp.betclic.title": "Apprentice — Gen AI Transformation Squad",
+    "exp.betclic.type": "Apprenticeship",
+    "exp.betclic.dates": "September 2026 →",
+    "exp.betclic.location": "Bordeaux, France",
+    "exp.betclic.description":
+      "Final-year apprenticeship in the squad driving generative AI adoption across the group. What I'll be doing there:\n→ Identifying and scoping Gen AI use cases with business teams\n→ Automating workflows and testing agents in real conditions\n→ Supporting teams and spreading good practices\n→ Measuring adoption and the real impact of what ships",
+    "exp.betclic.badge1": "Gen AI",
+    "exp.betclic.badge2": "Adoption & change",
+    "exp.betclic.badge3": "Automation",
+
+    "exp.cleo.title": "Founder — Cléo",
+    "exp.cleo.type": "Entrepreneurial project",
+    "exp.cleo.dates": "June 2026 — Present",
+    "exp.cleo.location": "Marseille, France",
+    "exp.cleo.description":
+      "Digital welcome books for Airbnb hosts, guesthouses and property managers. Product, code, infra and support, solo.\n→ 150+ booklets created since launch, 4.4/5 on Trustpilot\n→ Generated from a listing: Apify scraping, deterministic mapping, then an LLM forced to quote an exact excerpt from the source\n→ Server-side verification of every generated instruction — no proof in the listing, no output\n→ Multilingual guest assistant, shared by link or QR code, no app required\n→ €29 lifetime per booklet, €69 done-for-you, custom pricing for property managers",
+    "exp.cleo.badge1": "150+ booklets",
+    "exp.cleo.badge2": "4.4/5 Trustpilot",
+    "exp.cleo.badge3": "Solo product",
 
     "exp.roofwander.title": "Business Developer & Partnerships",
     "exp.roofwander.type": "Internship",
-    "exp.roofwander.dates": "March 2026 — Present",
+    "exp.roofwander.dates": "March — August 2026",
     "exp.roofwander.location": "Brussels, Belgium",
     "exp.roofwander.description":
-      "Rooftop tent rental marketplace for individuals and professionals.\n→ Prospecting and closing partnerships with retailers and outdoor brands\n→ Acquiring and onboarding owners onto the platform\n→ Structuring sales processes and CRM\n→ AI automations (Claude, Cursor) to qualify leads and accelerate operations",
+      "Rooftop tent rental marketplace for individuals and professionals.\n→ Prospecting and closing partnerships with retailers and outdoor brands\n→ Acquiring and onboarding owners onto the platform\n→ Structuring sales processes and CRM\n→ AI automations to qualify leads and speed up operations",
     "exp.roofwander.badge1": "B2B Partnerships",
     "exp.roofwander.badge2": "Growth & SEO",
     "exp.roofwander.badge3": "AI Automations",
 
     "exp.addetective.title": "Founder — AI SaaS",
     "exp.addetective.type": "Entrepreneurial project",
-    "exp.addetective.dates": "January 2026 — Present",
+    "exp.addetective.dates": "January — June 2026",
     "exp.addetective.location": "Marseille, France",
     "exp.addetective.description":
-      "AI-powered listing analysis SaaS for real estate and vehicles, designed and built solo.\n→ Text + photo analysis, risk score, red flags and negotiation margin in 30s\n→ Stack: React/Vite, Supabase, Stripe, LLMs (Claude, GPT)\n→ Fully built with Cursor and Claude Code, from prototype to production",
+      "AI-powered listing analysis SaaS for real estate and vehicles, designed and built solo.\n→ Text + photo analysis, risk score and estimated negotiation margin in 30s\n→ Stack: React/Vite, Supabase, Stripe, LLMs (Claude, GPT)\n→ First product taken from idea all the way to production",
     "exp.addetective.badge1": "Solo product",
     "exp.addetective.badge2": "AI SaaS",
     "exp.addetective.badge3": "Idea → Prod",
@@ -286,48 +228,7 @@ const translations: Record<Lang, Record<string, string>> = {
     "exp.coquille.badge2": "E-commerce",
     "exp.coquille.badge3": "Branding",
 
-    "exp.armees.title": "Discovery intern",
-    "exp.armees.type": "Internship",
-    "exp.armees.dates": "February — March 2021",
-    "exp.armees.location": "Toulon, France",
-    "exp.armees.description":
-      "→ Immersion at a naval air base: technical services, specialized units\n→ Exchanges with civilian and military personnel about Defense careers",
-    "exp.armees.badge1": "Defense",
-    "exp.armees.badge2": "Discovery internship",
-
-    // Education
-    "edu.title": "Education",
-    "edu.dateline": "1 DEGREE · 3 CERTIFICATIONS",
-    "edu.degree_kicker": "BACHELOR · INTERNATIONAL BUSINESS",
-    "edu.degree": "Bachelor in International Management — International Business",
-    "edu.dates": "2024 — 2027",
-    "edu.bde": "VP of the Student Union",
-    "edu.certs": "Certifications",
-    "edu.anthropic.count": "3 certifications · 2025",
-    "edu.mooc.org": "ESSCA · 2025",
-    "edu.ai.org": "Compétences et Métiers · 2024",
-
-    // Skills
-    "skills.title": "What I can do.",
-    "skills.kicker": "CAPABILITIES",
-    "skills.dateline": "3 AXES · DAILY USE",
-    "skills.subtitle": "Build, grow and optimize products using AI as a lever.",
-    "skills.cat1.title": "Build with AI",
-    "skills.cat1.desc": "Tools mastered daily to design and ship.",
-    "skills.cat2.title": "Grow the business",
-    "skills.cat2.desc": "Acquisition, growth and operational partnerships.",
-    "skills.cat3.title": "Design the product",
-    "skills.cat3.desc": "From strategic framing to production deployment.",
-    "skills.legend": "Daily use",
-    "skills.tooltip.daily": "Daily use",
-    "skills.tooltip.project": "Applied in projects",
-    "skills.tooltip.operational": "Operational experience",
-    "skills.pill.saas": "SaaS Development",
-
     // Contact
-    "contact.title": "Want to work together?",
-    "contact.subtitle": "I'm looking for an internship starting September 2026 in Business Dev, Product or Applied AI.",
-    "contact.download": "Download CV (PDF)",
     "contact.toast.emailCopied": "Email copied",
     "contact.toast.emailCopiedDesc": "Pasted to clipboard.",
     "contact.toast.copyFailed": "Copy failed",
@@ -342,6 +243,7 @@ const translations: Record<Lang, Record<string, string>> = {
     "contact.cv.pick": "Choose language",
     "contact.cv.fr": "French version",
     "contact.cv.en": "English version",
+
     "footer.made": "Built with AI",
   },
 };

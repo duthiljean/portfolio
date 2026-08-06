@@ -17,6 +17,7 @@ import chatgptLogo from "@/assets/chatgpt-logo.png";
 import vscodeLogo from "@/assets/vscode-logo.svg";
 import geminiLogo from "@/assets/gemini-logo.jpeg";
 import codexLogo from "@/assets/codex-color.png";
+import cursorLogo from "@/assets/cursor-logo.png";
 import {
   Tooltip,
   TooltipContent,
@@ -38,6 +39,7 @@ const pillLogos: Record<string, string> = {
   "VS Code": vscodeLogo,
   Gemini: geminiLogo,
   Codex: codexLogo,
+  Cursor: cursorLogo,
 };
 
 const ICON_MAP = {
@@ -212,7 +214,7 @@ const DailyStackCard = ({
             </div>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 md:gap-2.5 flex-1 md:max-w-[640px]">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 md:gap-2.5 flex-1 md:max-w-[640px]">
             {tools.map((tool, i) => {
               const logo = tool.logo || pillLogos[tool.name];
               return (
@@ -265,19 +267,20 @@ const CategoryCard = ({
   cat,
   index,
   lang,
-  dailyToolNames,
   tooltips,
 }: {
   cat: SkillCategory;
   index: number;
   lang: "fr" | "en";
-  dailyToolNames: Set<string>;
   tooltips: Record<string, string>;
 }) => {
   const Icon = ICON_MAP[cat.icon ?? "sparkles"] ?? Sparkles;
   const { ref, onPointerMove } = useSpotlight<HTMLDivElement>();
   const pills = cat.pills ?? [];
-  const dailyCount = pills.filter((p) => dailyToolNames.has(p.name)).length;
+  // "Proven" = done inside a company or shipped on my own products
+  const provenCount = pills.filter(
+    (p) => p.tooltipType === "operational" || p.tooltipType === "project",
+  ).length;
 
   return (
     <motion.div
@@ -311,7 +314,7 @@ const CategoryCard = ({
         <div className="text-[10px] font-medium tabular-nums text-muted-foreground">
           <span className="text-foreground font-semibold">{pills.length}</span>
           <span className="mx-0.5">/</span>
-          <span>{lang === "fr" ? "outils" : "tools"}</span>
+          <span>{lang === "fr" ? "compétences" : "capabilities"}</span>
         </div>
       </div>
 
@@ -332,27 +335,27 @@ const CategoryCard = ({
             key={p._key ?? p.name}
             p={p}
             tooltip={tooltips[p.tooltipType ?? "project"] ?? ""}
-            isDaily={dailyToolNames.has(p.name)}
+            isDaily={p.tooltipType === "daily"}
             delay={0.1 + pi * 0.03}
           />
         ))}
       </div>
 
-      {dailyCount > 0 && (
+      {provenCount > 0 && (
         <div className="mt-5 pt-4 border-t border-border/60 flex items-center gap-2.5">
           <div className="relative h-1 flex-1 rounded-full bg-border/70 overflow-hidden">
             <motion.span
               initial={{ width: 0 }}
-              whileInView={{ width: `${(dailyCount / pills.length) * 100}%` }}
+              whileInView={{ width: `${(provenCount / pills.length) * 100}%` }}
               viewport={{ once: true, amount: 0.5 }}
               transition={{ duration: 0.9, delay: 0.2 + index * 0.08, ease: [0.16, 1, 0.3, 1] }}
               className="absolute inset-y-0 left-0 rounded-full bg-foreground"
             />
           </div>
           <div className="text-[10px] font-medium tabular-nums text-muted-foreground shrink-0">
-            <span className="text-foreground">{dailyCount}</span>
+            <span className="text-foreground">{provenCount}</span>
             <span className="mx-0.5">·</span>
-            <span>{lang === "fr" ? "quotidien" : "daily"}</span>
+            <span>{lang === "fr" ? "en prod" : "shipped"}</span>
           </div>
         </div>
       )}
@@ -365,12 +368,11 @@ const Skills = () => {
   const skills: SkillsSection = fallbackSkills;
   const categories = skills.categories ?? [];
   const dailyStack = skills.dailyStack ?? [];
-  const dailyToolNames = new Set(dailyStack.map((t) => t.name));
 
   const tooltips: Record<string, string> = {
-    daily: lang === "fr" ? "Usage quotidien" : "Daily use",
-    project: lang === "fr" ? "Appliqué en projet" : "Applied in projects",
-    operational: lang === "fr" ? "Expérience opérationnelle" : "Operational experience",
+    daily: lang === "fr" ? "Au quotidien" : "Every day",
+    project: lang === "fr" ? "Sur mes produits" : "On my own products",
+    operational: lang === "fr" ? "En entreprise" : "In a company",
   };
 
   const kicker = pickLocale(skills.kicker, lang);
@@ -415,7 +417,11 @@ const Skills = () => {
             <div className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
               <span className="h-px w-8 bg-border" />
               <span className="tabular-nums text-foreground">{totalTools}</span>
-              <span>{lang === "fr" ? `outils · ${categories.length} axes` : `tools · ${categories.length} axes`}</span>
+              <span>
+                {lang === "fr"
+                  ? `compétences · ${categories.length} axes`
+                  : `capabilities · ${categories.length} axes`}
+              </span>
             </div>
           </motion.div>
 
@@ -432,7 +438,6 @@ const Skills = () => {
                 cat={cat}
                 index={i}
                 lang={lang as "fr" | "en"}
-                dailyToolNames={dailyToolNames}
                 tooltips={tooltips}
               />
             ))}
@@ -447,15 +452,15 @@ const Skills = () => {
           >
             <span className="inline-flex items-center gap-1.5">
               <span className="inline-flex h-3 w-5 rounded-full border border-foreground/15 bg-foreground/[0.04]" />
-              {lang === "fr" ? "Usage quotidien" : "Daily use"}
+              {lang === "fr" ? "Au quotidien" : "Every day"}
             </span>
             <span className="inline-flex items-center gap-1.5">
               <span className="inline-flex h-3 w-5 rounded-full border border-border bg-card" />
-              {lang === "fr" ? "Appliqué en projet" : "Applied in projects"}
+              {lang === "fr" ? "Sur mes produits ou en entreprise" : "On my products or in a company"}
             </span>
             <span className="hidden sm:inline-flex items-center gap-1.5">
               <span className="inline-flex h-1 w-5 rounded-full bg-foreground" />
-              {lang === "fr" ? "Ratio quotidien / catégorie" : "Daily ratio / category"}
+              {lang === "fr" ? "Part déjà mise en prod" : "Share already shipped"}
             </span>
           </motion.div>
         </div>
